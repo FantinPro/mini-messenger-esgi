@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <title>Document</title>
+    <style>
+        html {
+            height: -webkit-fill-available;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        /* Avoid Chrome to see Safari hack */
+        @supports (-webkit-touch-callout: none) {
+            body {
+                /* The hack for Safari */
+                min-height: -webkit-fill-available;
+            }
+        }
+
+        #root {
+            min-height: inherit;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script src="./src/index.jsx" type="module"></script>
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+node_modules
+./package-lock.json
+.env*
+.vscode
+.git
+ds_store
+.DS_Store
+.npm
+.config
+.cache
+db-data-*
+prisma
+.node*
+build
