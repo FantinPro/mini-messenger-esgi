@@ -1,5 +1,6 @@
 ## Usage
 
+
 ## Client
 
 ```bash
@@ -10,6 +11,21 @@ make client
 
 ```bash
 make server
+```
+
+## Restart containers
+```bash
+make restart
+```
+
+## Migrate
+```bash
+make migrate
+```
+
+## Fixtures
+```bash
+make fixtures
 ```
 
 ## Production
