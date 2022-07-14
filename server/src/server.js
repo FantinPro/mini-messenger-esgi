@@ -8,6 +8,8 @@ import config from './config/config';
 import * as passportConfig from './config/passport';
 import { errorHandler } from './middlewares/error';
 import routes from './routes/index';
+import { ApiError } from './utils/ApiError';
+import logger from './config/logger';
 
 const server = express();
 
@@ -30,6 +32,15 @@ passportConfig.initialize(server);
 server.use(compression({
     level: 9,
 }));
+
+server.get('/test', (req, res, next) => {
+    try {
+        logger.warn('WARNING');
+        res.json({});
+    } catch (e) {
+        next(e);
+    }
+});
 
 // If you want to make a render from the server, you can uncomments this line
 // server.use(express.static(process.env.NODE_ENV === 'development' ? '../build/client' : './build/client'));
@@ -64,4 +75,4 @@ server.get(
 
 server.use(errorHandler);
 
-server.listen(config.expressPort, () => console.log(`server started on port ${config.expressPort} with env ${config.env}`));
+server.listen(config.expressPort, () => logger.info(`server started on port ${config.expressPort} with env ${config.env}`));

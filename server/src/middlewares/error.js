@@ -1,6 +1,5 @@
 import { ValidationError } from 'sequelize';
-import config from '../config/config';
-import { logger } from '../config/logger';
+import logger from '../config/logger';
 
 const _formatError = (validationError) => validationError.errors.reduce((acc, error) => {
     acc[error.path] = error.message;
@@ -9,6 +8,7 @@ const _formatError = (validationError) => validationError.errors.reduce((acc, er
 
 export const errorHandler = (err, req, res, next) => {
     if (err instanceof ValidationError) {
+        logger.warn(`Validation error: ${JSON.stringify(_formatError(err))}`);
         return res.status(422).json(_formatError(err));
     }
 
@@ -21,8 +21,10 @@ export const errorHandler = (err, req, res, next) => {
         // stack: err.stack,
     };
 
-    if (config.env === 'development') {
-        logger.error(err);
+    if (response.code === 500) {
+        logger.error(`Internal server error: ${JSON.stringify(response)}`);
+    } else {
+        logger.warn(`${response.code} error: ${JSON.stringify(response)}`);
     }
 
     res.status(response.code).json(response);

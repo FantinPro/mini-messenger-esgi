@@ -1,8 +1,7 @@
 {
   "type": "module",
   "private": true,
-  "scripts": {
-  },
+  "scripts": {},
   "workspaces": [
     "client",
     "server"
