@@ -21,7 +21,7 @@ export const errorHandler = (err, req, res, next) => {
         // stack: err.stack,
     };
 
-    if (response.code === 500) {
+    if (response.code >= 500) {
         logger.error(`Internal server error: ${JSON.stringify(response)}`);
     } else {
         logger.warn(`${response.code} error: ${JSON.stringify(response)}`);
