@@ -33,15 +33,6 @@ server.use(compression({
     level: 9,
 }));
 
-server.get('/test', (req, res, next) => {
-    try {
-        logger.warn('WARNING');
-        res.json({});
-    } catch (e) {
-        next(e);
-    }
-});
-
 // If you want to make a render from the server, you can uncomments this line
 // server.use(express.static(process.env.NODE_ENV === 'development' ? '../build/client' : './build/client'));
 

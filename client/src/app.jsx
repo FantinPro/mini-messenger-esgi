@@ -5,6 +5,7 @@ import AuthRoute from './components/auth/AuthRoute';
 import Login from './components/auth/Login';
 import Logout from './components/auth/Logout';
 import Register from './components/auth/Register';
+import ErrorBoundary from './components/error/ErrorBoundary';
 import Home from './components/home/Home';
 import Chat from './components/home/Main/Chat';
 import { UserContext } from './contexts/user.context';
@@ -44,7 +45,9 @@ export default function App() {
                     <Route
                         path="/"
                         element={
-                            <Home />
+                            <AuthRoute >
+                                <Home />
+                            </AuthRoute>
                         }
                     >
                         <Route path="friends/:friendId" element={<Chat />} />
@@ -57,11 +60,8 @@ export default function App() {
                                 <Admin />
                             </AuthRoute>
                         } />
-
                 </Routes>
             }
-            
-            
         </UserContext.Provider>
     );
 }

@@ -4,6 +4,7 @@ import userRoutes from './user.routes';
 import messageRoutes from './message.routes';
 import friendRoutes from './friend.routes';
 import interestRoutes from './interest.routes';
+import logRoutes from './log.routes';
 
 const router = express.Router();
 
@@ -27,6 +28,10 @@ const routes = [
     {
         path: 'interests',
         routes: interestRoutes,
+    },
+    {
+        path: 'logs',
+        routes: logRoutes,
     },
 ];
 
