@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Admin from './components/admin/Admin';
+import Logs from './components/admin/AdminContent/Logs/Logs.jsx';
+import Reports from './components/admin/AdminContent/Reports/ReportsTable';
 import AuthRoute from './components/auth/AuthRoute';
 import Login from './components/auth/Login';
 import Logout from './components/auth/Logout';
@@ -44,24 +46,25 @@ export default function App() {
                     <Route
                         path="/"
                         element={
-                            <Home />
+                            <AuthRoute >
+                                <Home />
+                            </AuthRoute>
                         }
                     >
                         <Route path="friends/:friendId" element={<Chat />} />
                     </Route>
 
                     <Route
-                        path="admin"
                         element={
-                            <AuthRoute role='ROLE_ADMIN' >
-                                <Admin />
-                            </AuthRoute>
-                        } />
-
+                            <Admin />
+                        }>
+                        {/* default route is Logs */}
+                        <Route path="admin/logs" element={<Logs />} />
+                        <Route path="admin/reports" element={<Reports />} />
+                        <Route path="admin" element={<Navigate to="logs" />} />
+                    </Route>
                 </Routes>
             }
-            
-            
         </UserContext.Provider>
     );
 }

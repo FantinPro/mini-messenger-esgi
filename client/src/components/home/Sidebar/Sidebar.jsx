@@ -1,7 +1,6 @@
 import MenuIcon from '@mui/icons-material/Menu';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import CssBaseline from '@mui/material/CssBaseline';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
@@ -25,13 +24,11 @@ export default function Sidebar({ sidebarWith }) {
 
     return (
         <>
-            <CssBaseline />
             <AppBar position="fixed" sx={{
                 width: { sm: `calc(100% - ${sidebarWith}px)` },
                 ml: { sm: `${sidebarWith}px` },
             }}
             >
-
                 {/* Top NavBar */}
                 <Toolbar sx={{ justifyContent: 'space-between'}}>
                     <IconButton

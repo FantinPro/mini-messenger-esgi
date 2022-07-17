@@ -33,15 +33,6 @@ server.use(compression({
     level: 9,
 }));
 
-server.get('/test', (req, res, next) => {
-    try {
-        logger.warn('WARNING');
-        res.json({});
-    } catch (e) {
-        next(e);
-    }
-});
-
 // If you want to make a render from the server, you can uncomments this line
 // server.use(express.static(process.env.NODE_ENV === 'development' ? '../build/client' : './build/client'));
 
@@ -75,4 +66,8 @@ server.get(
 
 server.use(errorHandler);
 
-server.listen(config.expressPort, () => logger.info(`server started on port ${config.expressPort} with env ${config.env}`));
+server.listen(config.expressPort, () => logger.info(`server started on port ${config.expressPort} with env ${config.env}`, {
+    metadata: {
+        service: 'server',
+    },
+}));
