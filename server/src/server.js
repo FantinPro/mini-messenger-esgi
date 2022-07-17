@@ -66,4 +66,8 @@ server.get(
 
 server.use(errorHandler);
 
-server.listen(config.expressPort, () => logger.info(`server started on port ${config.expressPort} with env ${config.env}`));
+server.listen(config.expressPort, () => logger.info(`server started on port ${config.expressPort} with env ${config.env}`, {
+    metadata: {
+        service: 'server',
+    },
+}));

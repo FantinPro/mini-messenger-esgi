@@ -1,6 +1,5 @@
-import { Box, Divider, List, Toolbar } from '@mui/material';
+import { Box, Divider } from '@mui/material';
 import React, { useCallback } from 'react';
-import BottomNavigationSidebar from '../BottomNavigationSideBar/BottomNavigationSideBar';
 import FriendItemsConversation from './FriendItemsConversation';
 
 export default function SidebarContent ({ navigationIndex }) {

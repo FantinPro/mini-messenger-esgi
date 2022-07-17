@@ -5,6 +5,7 @@ const baseUrl = `${config.apiUrl}/logs`;
 
 export const logService = {
     sendLogError,
+    search
 };
 
 function sendLogError({
@@ -17,4 +18,13 @@ function sendLogError({
         message,
         meta
     });
+}
+
+/**
+ * 
+ * @param {Object} filterLogs - filterLogs.startDate, filterLogs.endDate, filterLogs.textSearch, filterLogs.severity, filterLogs.application
+ * @returns 
+ */
+function search(filter) {
+    return httpMethodsWrapper.post(`${baseUrl}/search`, filter);
 }

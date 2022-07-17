@@ -31,7 +31,10 @@ export default class ErrorBoundary extends React.Component {
         logService.sendLogError({
             level: 'error',
             message: error.message,
-            meta: errorInfo
+            meta: {
+                ...errorInfo,
+                service: 'client'
+            }
         })
     }
 
@@ -71,7 +74,7 @@ export default class ErrorBoundary extends React.Component {
                             Something wen wrong, our team is working on it. Please try later.
                         </Alert>
                     </Snackbar>
-                    {this.props.children}
+                    <></>
                 </>
             );
         }

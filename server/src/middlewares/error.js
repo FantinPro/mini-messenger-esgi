@@ -8,7 +8,13 @@ const _formatError = (validationError) => validationError.errors.reduce((acc, er
 
 export const errorHandler = (err, req, res, next) => {
     if (err instanceof ValidationError) {
-        logger.warn(`Validation error: ${JSON.stringify(_formatError(err))}`);
+        logger.warn(`Validation error: ${JSON.stringify(_formatError(err))}`, {
+            metadata: {
+                url: req.url,
+                method: req.method,
+                service: 'server',
+            },
+        });
         return res.status(422).json(_formatError(err));
     }
 
@@ -22,9 +28,22 @@ export const errorHandler = (err, req, res, next) => {
     };
 
     if (response.code >= 500) {
-        logger.error(`Internal server error: ${JSON.stringify(response)}`);
+        logger.error(`Internal server error: ${JSON.stringify(response)}`, {
+            metadata: {
+                url: req.url,
+                method: req.method,
+                body: JSON.stringify(req.body || {}),
+                service: 'server',
+            },
+        });
     } else {
-        logger.warn(`${response.code} error: ${JSON.stringify(response)}`);
+        logger.warn(`${response.code} error: ${JSON.stringify(response)}`, {
+            metadata: {
+                url: req.url,
+                method: req.method,
+                service: 'server',
+            },
+        });
     }
 
     res.status(response.code).json(response);
