@@ -47,7 +47,12 @@ User.init(
             type: DataTypes.STRING,
             allowNull: true,
             defaultValue: `https://avatars.dicebear.com/api/male/${Math.random() * 100}.svg`,
-        }
+        },
+        validate: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,
+        },
     },
     {
         sequelize: connection,

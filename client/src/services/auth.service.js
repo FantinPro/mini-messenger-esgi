@@ -1,5 +1,6 @@
 import { httpMethodsWrapper } from '../helpers/http-methods-wrapper';
 import config from '../config/config';
+import { validate } from '../../../server/src/controllers/auth.controller';
 
 const baseUrl = `${config.apiUrl}/auth`;
 
@@ -7,7 +8,8 @@ export const authService = {
     login,
     // setUser,
     register,
-    getGoogleCallback
+    getGoogleCallback,
+    validateToken
 };
 
 function login(email, password) {
@@ -26,4 +28,8 @@ function register ({ email, username, password, interests }) {
 
 function getGoogleCallback() {
     return `${baseUrl}/google`;
+}
+
+function validateToken(token) {
+    return httpMethodsWrapper.post(`${baseUrl}/validate`, { token })
 }
