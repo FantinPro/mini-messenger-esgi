@@ -16,4 +16,5 @@ export default {
     },
     expressPort: process.env.SERVER_PORT || 9000,
     env: process.env.NODE_ENV || 'development',
+    mailerKey: process.env.MAILER_KEY,
 };

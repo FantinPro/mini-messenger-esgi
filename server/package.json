@@ -1,5 +1,4 @@
 {
-    "type": "module",
     "scripts": {
         "development": "rollup --config rollup.config.js --environment NODE_ENV:development --watch",
         "production": "rollup --config rollup.config.js --environment NODE_ENV:production",
@@ -25,6 +24,7 @@
         "pg-hstore": "2.3.4",
         "regenerator-runtime": "^0.13.9",
         "sequelize": "6.21.2",
+        "sib-api-v3-sdk": "^8.4.0",
         "validator": "^13.7.0",
         "winston": "^3.7.2",
         "winston-mongodb": "^5.0.7"

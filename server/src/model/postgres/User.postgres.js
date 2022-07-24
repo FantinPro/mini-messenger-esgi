@@ -37,6 +37,11 @@ User.init(
             allowNull: false,
             defaultValue: roles.ROLE_USER,
         },
+        validate: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,
+        },
     },
     {
         sequelize: connection,
