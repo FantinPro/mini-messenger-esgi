@@ -4,7 +4,7 @@ import config from '../config/config';
 const baseUrl = `${config.apiUrl}/users`;
 
 export const userService = {
-    getUserByToken
+    getUserByToken,
 };
 
 function getUserByToken() {

@@ -37,6 +37,17 @@ User.init(
             allowNull: false,
             defaultValue: roles.ROLE_USER,
         },
+        username: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true,
+            defaultValue: '',
+        },
+        avatar: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            defaultValue: `https://avatars.dicebear.com/api/male/${Math.random() * 100}.svg`,
+        }
     },
     {
         sequelize: connection,

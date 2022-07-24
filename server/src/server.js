@@ -1,4 +1,6 @@
 import express from 'express';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import morganBody from 'morgan-body';
 import bodyParser from 'body-parser';
 import passport from 'passport';
@@ -10,6 +12,7 @@ import { errorHandler } from './middlewares/error';
 import routes from './routes/index';
 import { ApiError } from './utils/ApiError';
 import logger from './config/logger';
+import chat from './core/socket.chat';
 
 const server = express();
 
@@ -66,8 +69,19 @@ server.get(
 
 server.use(errorHandler);
 
-server.listen(config.expressPort, () => logger.info(`server started on port ${config.expressPort} with env ${config.env}`, {
+const app = createServer(server);
+const io = new Server(app, {
+    cors: {
+        origin: config.frontBaseUrl,
+        methods: ['GET', 'POST'],
+        credentials: true,
+    },
+});
+
+app.listen(config.expressPort, () => logger.info(`server started on port ${config.expressPort} with env ${config.env}`, {
     metadata: {
         service: 'server',
     },
 }));
+
+chat(io);

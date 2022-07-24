@@ -15,6 +15,11 @@ const validationSchema = yup.object({
         .string('Enter your email')
         .email('Enter a valid email')
         .required('Email is required'),
+    username: yup
+        .string('Enter your username')
+        .required('Username is required')
+        .min(3)
+        .max(20),
     password: yup
         .string('Enter your password')
         .min(8, 'Password should be of minimum 8 characters length')
@@ -45,13 +50,14 @@ export default function Register() {
     const formik = useFormik({
         initialValues: {
             email: '',
+            username: '',
             password: '',
             interests: [],
         },
         validationSchema,
-        onSubmit: ({ email, password, interests }, { setStatus }) => {
+        onSubmit: ({ email, username, password, interests }, { setStatus }) => {
             authService
-                .register({ email, password, interests })
+                .register({ email, username, password, interests })
                 .then((res) => {
                     setUser(res.user);
                     navigate('/');
@@ -60,6 +66,9 @@ export default function Register() {
                     let customError = "Something went wrong";
                     if (err.match(/email/)) {
                         customError = "Email already exists";
+                    }
+                    if (err.match(/username/)) {
+                        customError = "Username is already taken";
                     }
                     setStatus(customError);
                 });
@@ -111,6 +120,17 @@ export default function Register() {
                         onChange={formik.handleChange}
                         error={formik.touched.email && Boolean(formik.errors.email)}
                         helperText={formik.touched.email && formik.errors.email} />
+                    <TextField
+                        margin='dense'
+                        fullWidth
+                        type='username'
+                        id="username"
+                        label="Username"
+                        variant="outlined"
+                        value={formik.values.username}
+                        onChange={formik.handleChange}
+                        error={formik.touched.username && Boolean(formik.errors.username)}
+                        helperText={formik.touched.username && formik.errors.username} />
                     <FormControl 
                         fullWidth 
                         margin='dense' 

@@ -25,6 +25,8 @@
         "pg-hstore": "2.3.4",
         "regenerator-runtime": "^0.13.9",
         "sequelize": "6.21.2",
+        "socket.io": "^4.5.1",
+        "uuid": "^8.3.2",
         "validator": "^13.7.0",
         "winston": "^3.7.2",
         "winston-mongodb": "^5.0.7"

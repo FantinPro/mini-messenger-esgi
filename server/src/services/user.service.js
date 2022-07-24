@@ -6,12 +6,13 @@ import { Interest } from '../model/postgres/Interest.postgres';
 import { ApiError } from '../utils/ApiError';
 
 export const createUser = async (userBody) => {
-    const { email, password, interests } = userBody;
+    const { email, username, password, interests } = userBody;
     if (!interests?.length) {
-        throw new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, 'interests is required');
+        throw new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, 'At least one interest is required');
     }
     const newUser = await User.create({
         email,
+        username,
         password,
     });
     // find interests
@@ -37,14 +38,14 @@ export const createUser = async (userBody) => {
 export const loginUserWithEmailAndPassword = async (email, password) => {
     const user = await User.findOne({ where: { email } });
     if (!user) {
-        throw new ApiError(StatusCodes.UNAUTHORIZED, 'Incorrect identifiants');
+        throw new ApiError(StatusCodes.UNAUTHORIZED, 'Incorrect credentials');
     }
     if (user?.googleId) {
         return false;
     }
     const isPasswordMatch = await bcryptjs.compare(password, user?.password);
     if (!isPasswordMatch) {
-        throw new ApiError(StatusCodes.UNAUTHORIZED, 'Incorrect identifiants');
+        throw new ApiError(StatusCodes.UNAUTHORIZED, 'Incorrect credentials');
     }
 
     return user;

@@ -2,7 +2,7 @@ import { Op } from 'sequelize';
 import { Friend, User } from '../model/postgres/index';
 import { friendsStatus } from '../utils/Helpers';
 
-export const getFriendsList = async (userId, status = [friendsStatus.ACTIVE]) => Friend.findAll({
+export const getFriendsList = async (userId, status = [friendsStatus.ACTIVE, friendsStatus.PENDING]) => Friend.findAll({
     where: {
         [Op.or]: [
             {
@@ -20,21 +20,85 @@ export const getFriendsList = async (userId, status = [friendsStatus.ACTIVE]) =>
         {
             model: User,
             as: 'sender',
-            attributes: ['id', 'email'],
+            attributes: ['id', 'email', 'username'],
         },
         {
             model: User,
             as: 'receiver',
-            attributes: ['id', 'email'],
+            attributes: ['id', 'email', 'username'],
         },
     ],
 });
 
-export const sendFriendInvitation = ({ senderId, receiverId }) => Friend.create({
-    senderId,
-    receiverId,
-    status: friendsStatus.PENDING,
-});
+export const sendFriendInvitation = ({ senderId, receiverId }) => {
+    if (receiverId === '' || receiverId === undefined) {
+        return 'null'
+    }
+    return User.findOne({
+        where: {
+            [Op.or]: [
+                {
+                    username: receiverId,
+                },
+                {
+                    email: receiverId,
+                },
+            ],
+        },
+    }).then((receiver) => {
+        if (receiver) {
+            if (receiver.id === senderId) {
+                return {
+                    status: 'ERROR_SAME_USER'
+                };
+            }
+            return Friend.findOne({
+                where: {
+                    [Op.or]: [
+                        {
+                            senderId: senderId,
+                            receiverId: receiver.id,
+                        },
+                        {
+                            senderId: receiver.id,
+                            receiverId: senderId,
+                        },
+                    ],
+                },
+            }).then((friend) => {
+                if (friend) {
+                    switch (friend.status) {
+                        case friendsStatus.ACTIVE:
+                            return {
+                                status: friendsStatus.EXISTS,
+                            }
+                        case friendsStatus.PENDING:
+                            return {
+                                status: friendsStatus.PENDING,
+                            };
+                    }
+                }
+                return Friend.create({
+                    senderId,
+                    receiverId: receiver.id,
+                    status: friendsStatus.PENDING,
+                })
+                    .then(() => {
+                        return {
+                            status: friendsStatus.ADDED,
+                        };;
+                    });
+            })
+        } else {
+            return {
+                status: friendsStatus.UNKNOWN_USER,
+            };;
+        }
+    })
+    .catch((err) => {
+        console.log(err)
+    })
+};
 
 export const acceptFriendInvitation = (friendId) => Friend.update(
     {

@@ -17,8 +17,8 @@ function login(email, password) {
     });
 }
 
-function register ({ email, password, interests }) {
-    return httpMethodsWrapper.post(`${baseUrl}/register`, { email, password, interests }).then((res) => {
+function register ({ email, username, password, interests }) {
+    return httpMethodsWrapper.post(`${baseUrl}/register`, { email, username, password, interests }).then((res) => {
         localStorage.setItem('jwt', res.token);
         return res
     })

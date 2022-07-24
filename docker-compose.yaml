@@ -16,6 +16,8 @@ services:
       - .:/home/node
     depends_on:
       - postgres
+    networks:
+      - mini-messenger
 
   postgres:
       image: postgres:13-alpine
@@ -30,6 +32,8 @@ services:
         - target: 5432
           published: 5432
           protocol: tcp
+      networks:
+        - mini-messenger
 
   mongodb:
       image: mongo:4.2.1-bionic
@@ -37,9 +41,17 @@ services:
         - '27017:27017'
       volumes:
         - ./db-data-mongodb:/data/db
+      networks:
+        - mini-messenger
 
   adminer:
       image: adminer
       restart: always
       ports:
         - 8080:8080
+      networks:
+        - mini-messenger
+
+networks:
+  mini-messenger:
+    driver: bridge

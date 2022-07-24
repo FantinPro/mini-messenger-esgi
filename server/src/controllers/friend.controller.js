@@ -13,11 +13,11 @@ export const getFriendsList = async (req, res, next) => {
 
 export const sendFriendInvitation = async (req, res, next) => {
     try {
-        const { receiverId } = req.body;
+        const { receiverNameOrEmail } = req.body;
 
         const pendingFriend = await friendService.sendFriendInvitation({
             senderId: req.user.id,
-            receiverId,
+            receiverId: receiverNameOrEmail,
         });
         res.json(pendingFriend);
     } catch (e) {

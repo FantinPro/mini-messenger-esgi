@@ -1,15 +1,11 @@
 import MenuIcon from '@mui/icons-material/Menu';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import IconButton from '@mui/material/IconButton';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
+import { AppBar, Box, Drawer, IconButton, Toolbar, Typography, Button, Menu, MenuItem, Avatar, Link } from '@mui/material';
 import React, { useContext, useState } from 'react';
 import SidebarContent from './SidebarContent/SidebarContent';
 import BottomNavigationSidebar from './BottomNavigationSideBar/BottomNavigationSideBar';
 import logo from '../../../../assets/images/messenger.png';
 import { UserContext } from '../../../contexts/user.context';
+import { useNavigate } from 'react-router-dom';
 
 export default function Sidebar({ sidebarWith }) {
 
@@ -17,9 +13,23 @@ export default function Sidebar({ sidebarWith }) {
 
     const [mobileOpen, setMobileOpen] = useState(false);
     const [navigationIndex, setNavigationIndex] = useState(0);
+    const navigate = useNavigate();
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
+    };
+
+    const handleLogout = () => {
+        navigate('/logout');
+    }
+
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
     };
 
     return (
@@ -30,7 +40,7 @@ export default function Sidebar({ sidebarWith }) {
             }}
             >
                 {/* Top NavBar */}
-                <Toolbar sx={{ justifyContent: 'space-between'}}>
+                <Toolbar sx={{ justifyContent: 'space-between' }}>
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"
@@ -40,15 +50,39 @@ export default function Sidebar({ sidebarWith }) {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Box sx={{ display: 'flex'}}>
+                    <Box sx={{ display: 'flex' }}>
                         <img src={logo} width='40' />
                         <Typography alignSelf='center' ml={2} variant="h6" noWrap component="div">
-                        Messenger
+                            Messenger
                         </Typography>
                     </Box>
-                    <div>
-                        { user.email }
-                    </div>
+                    <Box sx={{ display: 'flex' }}>
+                        <p style={{ marginRight: '10px', fontWeight: 'bold' }}>{user.username}</p>
+                        <IconButton
+                            id="basic-button"
+                            variant="contained"
+                            aria-controls={open ? 'basic-menu' : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={open ? 'true' : undefined}
+                            onClick={handleClick}
+                        >
+                            <Avatar alt={user.username} src={user.avatar} />
+                        </IconButton>
+                        <Menu
+                            id="basic-menu"
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleClose}
+                            MenuListProps={{
+                                'aria-labelledby': 'basic-button',
+                            }}
+                        >
+                            <MenuItem onClick={handleClose}>Profile</MenuItem>
+                            <MenuItem onClick={handleClose}>My account</MenuItem>
+                            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                            
+                        </Menu>
+                    </Box>
                 </Toolbar>
                 {/* End Top NavBar */}
 
