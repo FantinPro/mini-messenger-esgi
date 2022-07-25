@@ -76,7 +76,7 @@ export default function Login() {
                         customError = "Invalid credentials";
                     }
                     if(err.match(/User is not validated/i)){
-                        customError = "User is not validated";
+                        customError = "Confirm your account";
                     }
                     setStatus(customError);
                 });

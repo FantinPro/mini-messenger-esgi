@@ -42,7 +42,7 @@ export const loginUserWithEmailAndPassword = async (email, password) => {
     if (!user) {
         throw new ApiError(StatusCodes.UNAUTHORIZED, 'Incorrect credentials');
     }
-    if (!user.validate) {
+    if (!user.active) {
         throw new ApiError(StatusCodes.UNAUTHORIZED, 'User is not validated');
     }
     if (user?.googleId) {

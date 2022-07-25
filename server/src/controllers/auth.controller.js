@@ -82,10 +82,6 @@ export const resetPassword = async (req, res, next) => {
             },
         });
 
-        console.log('🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩');
-        console.log(user);
-        console.log('🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦');
-
         if (!user) {
             throw new ApiError(StatusCodes.NOT_FOUND, 'Invalid email');
         }
