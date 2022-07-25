@@ -4,6 +4,7 @@ import { authorized } from '../middlewares/auth';
 
 const router = express.Router();
 
+router.post('/reset-password', usersController.resetPassword);
 router.get('/token', authorized(), usersController.getUserByToken);
 
 export default router;

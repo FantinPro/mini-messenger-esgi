@@ -20,10 +20,9 @@ const validationSchema = yup.object({
         .required('Username is required')
         .min(3)
         .max(20),
-    password: yup
-        .string('Enter your password')
-        .min(8, 'Password should be of minimum 8 characters length')
-        .required('Password is required'),
+    password: yup.string()
+        .min(8, 'Password should be at least 8 characters')
+        .required('No password provided.'),
     interests: yup.array().min(1, "at least 1 language is required").required("Interests are required"),
 });
 
@@ -118,6 +117,7 @@ export default function Register() {
                         variant="outlined"
                         value={formik.values.email}
                         onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                         error={formik.touched.email && Boolean(formik.errors.email)}
                         helperText={formik.touched.email && formik.errors.email} />
                     <TextField
@@ -144,6 +144,8 @@ export default function Register() {
                             type={showPassword ? 'text' : 'password'}
                             value={formik.values.password}
                             onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.password && Boolean(formik.errors.password)}
                             endAdornment={
                                 <InputAdornment position="end">
                                     <IconButton
@@ -201,6 +203,7 @@ export default function Register() {
                             fontWeight: 'bold',
                             width: 'fit-content',
                         }}
+                        mt={2}
                         onClick={() => navigate('/login')}
                         variant="subtitle1" color={'primary'} gutterBottom component="div">
                         Login

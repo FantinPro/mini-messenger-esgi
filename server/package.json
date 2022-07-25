@@ -1,5 +1,4 @@
 {
-    "type": "module",
     "scripts": {
         "development": "rollup --config rollup.config.js --environment NODE_ENV:development --watch",
         "production": "rollup --config rollup.config.js --environment NODE_ENV:production",
@@ -27,6 +26,7 @@
         "sequelize": "6.21.2",
         "socket.io": "^4.5.1",
         "uuid": "^8.3.2",
+        "sib-api-v3-sdk": "^8.4.0",
         "validator": "^13.7.0",
         "winston": "^3.7.2",
         "winston-mongodb": "^5.0.7"

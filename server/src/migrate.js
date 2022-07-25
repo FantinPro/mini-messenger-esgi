@@ -2,7 +2,7 @@ import { connection } from './model/postgres/index';
 
 connection
     .sync({
-        alter: true,
+        force: true,
     })
     .then(() => {
         console.log('Database synced');

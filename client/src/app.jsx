@@ -11,6 +11,7 @@ import Home from './components/home/Home';
 import Chat from './components/home/Main/Chat';
 import { UserContext } from './contexts/user.context';
 import { userService } from './services/user.service';
+import ResetPassword from './components/auth/ResetPassword';
 
 export default function App() {
 
@@ -42,6 +43,8 @@ export default function App() {
                         user ? <Navigate to="/" /> : <Register />
                     } />
                     <Route path="/logout" element={<Logout />} />
+
+                    <Route path="/reset-password" element={<ResetPassword />} />
 
                     <Route
                         path="/"

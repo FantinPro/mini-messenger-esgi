@@ -7,7 +7,8 @@ export const authService = {
     login,
     // setUser,
     register,
-    getGoogleCallback
+    getGoogleCallback,
+    sendResetPassword,
 };
 
 function login(email, password) {
@@ -26,4 +27,12 @@ function register ({ email, username, password, interests }) {
 
 function getGoogleCallback() {
     return `${baseUrl}/google`;
+}
+
+function sendResetPassword(email) {
+    return httpMethodsWrapper.post(`${baseUrl}/reset-password`, { email });
+}
+
+function resetPassword(token, password) {
+    return httpMethodsWrapper.post(`${baseUrl}/reset-password`, { token, password });
 }
