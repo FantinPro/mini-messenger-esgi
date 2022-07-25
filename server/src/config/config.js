@@ -6,6 +6,7 @@ export default {
         callbackUrl: process.env.GOOGLE_CALLBACK_URL,
     },
     frontBaseUrl: process.env.FRONT_BASE_URL || 'http://localhost:8001',
+    backBaseUrl: process.env.BACK_BASE_URL || 'http://localhost:9000',
     mongodb: {
         dbname: process.env.MONGODB_DBNAME,
         host: process.env.MONGODB_HOST,

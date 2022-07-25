@@ -12,3 +12,8 @@ export const friendsStatus = Object.freeze({
     ADDED: 'ADDED',
     ERROR_SAME_USER: 'ERROR_SAME_USER',
 });
+
+export const tokenTypes = Object.freeze({
+    CONFIRM_EMAIL: 'CONFIRM_EMAIL',
+    RESET_PASSWORD: 'RESET_PASSWORD',
+});

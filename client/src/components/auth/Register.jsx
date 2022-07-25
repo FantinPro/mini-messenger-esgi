@@ -21,11 +21,8 @@ const validationSchema = yup.object({
         .min(3)
         .max(20),
     password: yup.string()
-        .required('No password provided.')
-        .matches(
-            /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/,
-            'Password should contain at least 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special character'
-        ),
+        .min(8, 'Password should be at least 8 characters')
+        .required('No password provided.'),
     interests: yup.array().min(1, "at least 1 language is required").required("Interests are required"),
 });
 
@@ -206,6 +203,7 @@ export default function Register() {
                             fontWeight: 'bold',
                             width: 'fit-content',
                         }}
+                        mt={2}
                         onClick={() => navigate('/login')}
                         variant="subtitle1" color={'primary'} gutterBottom component="div">
                         Login

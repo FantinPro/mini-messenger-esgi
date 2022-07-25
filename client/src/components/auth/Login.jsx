@@ -1,5 +1,5 @@
 import { VisibilityOff, Visibility } from '@mui/icons-material';
-import { Box, Button, Container, FormControl, FormHelperText, IconButton, InputAdornment, InputLabel, OutlinedInput, Typography } from '@mui/material';
+import { Box, Button, Container, FormControl, FormHelperText, IconButton, InputAdornment, InputLabel, Modal, OutlinedInput, Typography, Alert } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { useFormik } from 'formik';
 import React, { useContext, useState } from 'react';
@@ -9,14 +9,34 @@ import { UserContext } from '../../contexts/user.context';
 import { authService } from '../../services/auth.service';
 import logo from '../../../assets/images/messenger.png';
 
-const validationSchema = yup.object().shape({
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+};
+
+const validationSchemaLogin = yup.object().shape({
     email: yup
         .string('Enter your email')
         .email('Enter a valid email')
         .required('Email is required'),
     password: yup
         .string('Enter your password')
+        .min(8, 'Password should be at least 8 characters')
         .required('Password is required'),
+});
+
+const validationSchemaResetPassword = yup.object({
+    email: yup
+        .string('Enter your email')
+        .email('Enter a valid email')
+        .required('Email is required'),
 });
 
 export default function Login() {
@@ -27,32 +47,68 @@ export default function Login() {
 
     const [showPassword, setShowPassword] = useState(false);
 
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+    const [emailSent, setEmailSent] = useState(false);
+
     const handleShowPassword = () => {
         setShowPassword(!showPassword);
     };
 
-    const formik = useFormik({
+    const formikLogin = useFormik({
         initialValues: {
             email: '',
             password: ''
         },
-        validationSchema,
+        validationSchema: validationSchemaLogin,
         onSubmit: ({ email, password }, { setStatus }) => {
             authService
                 .login(email, password)
                 .then((res) => {
                     setUser(res.user);
+                    setStatus(null);
                     navigate('/');
                 })
                 .catch((err) => {
                     let customError = "Something went wrong";
-                    if (err.match(/identifiant/i)) {
+                    if (err.match(/credentials/i)) {
                         customError = "Invalid credentials";
+                    }
+                    if(err.match(/User is not validated/i)){
+                        customError = "User is not validated";
                     }
                     setStatus(customError);
                 });
         }
     });
+
+
+    const formikResetPassword = useFormik({
+        initialValues: {
+            email: ''
+        },
+        validationSchema: validationSchemaResetPassword,
+        onSubmit: ({ email }, { setStatus }) => {
+            authService
+                .sendResetPassword(email)
+                .then(() => {
+                    setEmailSent(true);
+                    setStatus(null);
+                })
+                .catch((err) => {
+                    setEmailSent(false);
+                    let customError = "Something went wrong";
+                    if (err.match(/identifiant/i)) {
+                        customError = "Invalid credentials";
+                    }
+                    if (err.match(/Invalid email/i)) {
+                        customError = "Email does not exist";
+                    }
+                    setStatus(customError);
+                });
+        }
+    })
 
     return (
         <Box sx={
@@ -68,7 +124,7 @@ export default function Login() {
             <Container sx={{ display: 'flex', justifyContent: 'center' }}>
                 <Box
                     component="form"
-                    onSubmit={formik.handleSubmit}
+                    onSubmit={formikLogin.handleSubmit}
                     sx={{
                         boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
                         borderRadius: '10px',
@@ -91,23 +147,23 @@ export default function Login() {
                         id="email"
                         label="Email"
                         variant="outlined"
-                        value={formik.values.email}
-                        onChange={formik.handleChange}
-                        error={formik.touched.email && Boolean(formik.errors.email)}
-                        helperText={formik.touched.email && formik.errors.email} />
+                        value={formikLogin.values.email}
+                        onChange={formikLogin.handleChange}
+                        error={formikLogin.touched.email && Boolean(formikLogin.errors.email)}
+                        helperText={formikLogin.touched.email && formikLogin.errors.email} />
                     <FormControl
                         fullWidth
                         margin='dense'
                         variant="outlined"
-                        error={formik.touched.password && Boolean(formik.errors.password)}
+                        error={formikLogin.touched.password && Boolean(formikLogin.errors.password)}
                     >
                         <InputLabel htmlFor="password">Password</InputLabel>
                         <OutlinedInput
                             id="password"
                             label="Password"
                             type={showPassword ? 'text' : 'password'}
-                            value={formik.values.password}
-                            onChange={formik.handleChange}
+                            value={formikLogin.values.password}
+                            onChange={formikLogin.handleChange}
                             endAdornment={
                                 <InputAdornment position="end">
                                     <IconButton
@@ -121,15 +177,13 @@ export default function Login() {
                             }
                         />
                         <FormHelperText error id="accountId-error">
-                            {formik.touched.password && formik.errors.password}
+                            {formikLogin.touched.password && formikLogin.errors.password}
                         </FormHelperText>
                     </FormControl>
 
-
-
-                    {formik.status ? <Typography sx={{
+                    {formikLogin.status ? <Typography sx={{
                         color: 'red'
-                    }} variant='subtitle2'> {formik.status} </Typography> : null}
+                    }} variant='subtitle2'> {formikLogin.status} </Typography> : null}
 
 
                     <Button sx={{
@@ -138,6 +192,7 @@ export default function Login() {
                     <Typography mt={2} variant="subtitle1" gutterBottom component="div">
                         Don&apos;t have an account yet ?
                     </Typography>
+                    {/* register */}
                     <Typography
                         sx={{
                             cursor: 'pointer',
@@ -149,6 +204,59 @@ export default function Login() {
                         variant="subtitle1" color={'primary'} gutterBottom component="div">
                         Register
                     </Typography>
+
+                    {/* forgot password */}
+                    <Typography
+                        sx={{
+                            cursor: 'pointer',
+                            textDecoration: 'underline',
+                            fontWeight: 'bold',
+                            width: 'fit-content',
+                        }}
+                        onClick={handleOpen}
+                        variant="subtitle1" color={'primary'} gutterBottom component="div">
+                        Forgot your password?
+                    </Typography>
+
+                    <Modal
+                        open={open}
+                        onClose={handleClose}
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description"
+                    >
+                        <Box 
+                            component="form"
+                            onSubmit={formikResetPassword.handleSubmit}
+                            sx={style}>
+                            <Typography id="modal-modal-title" variant="h6" component="h2">
+                                Give us your email and we will send you a link to reset your password
+                            </Typography>
+                            <Alert severity="success" sx={{ width: '100%', display: emailSent ? 'flex': 'none' }}>
+                                Email sent!
+                            </Alert>
+                            <TextField
+                                margin='dense'
+                                fullWidth
+                                type='email'
+                                id="email"
+                                label="Email"
+                                variant="outlined"
+                                value={formikResetPassword.values.email}
+                                onBlur={formikResetPassword.handleBlur}
+                                onChange={formikResetPassword.handleChange}
+                                error={formikResetPassword.touched.email && Boolean(formikResetPassword.errors.email)}
+                                helperText={formikResetPassword.touched.email && formikResetPassword.errors.email} />
+
+                            {formikResetPassword.status ? <Typography sx={{
+                                color: 'red'
+                            }} variant='subtitle2'> {formikResetPassword.status} </Typography> : null}
+
+                            <Button sx={{
+                                marginTop: '1rem'
+                            }} fullWidth variant="contained" type='submit'>send</Button>
+                        </Box>
+                    </Modal>
+
                 </Box>
             </Container>
 

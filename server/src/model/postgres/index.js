@@ -7,6 +7,7 @@ import { Message } from './Message.postgres';
 import { Friend } from './Friend.postgres';
 import { User } from './User.postgres';
 import { Interest } from './Interest.postgres';
+import { Token } from './Token.postgres';
 
 Message.belongsTo(User, {
     as: 'sender',
@@ -41,8 +42,11 @@ Interest.belongsToMany(User, {
     through: 'UserInterest',
 });
 
+User.hasMany(Token);
+Token.belongsTo(User);
+
 export {
-    User, Message, Friend, connection,
+    User, Message, Friend, connection, Token, Interest,
 };
 
 /**

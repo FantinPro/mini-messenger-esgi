@@ -48,7 +48,7 @@ User.init(
             allowNull: true,
             defaultValue: `https://avatars.dicebear.com/api/male/${Math.random() * 100}.svg`,
         },
-        validate: {
+        active: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false,

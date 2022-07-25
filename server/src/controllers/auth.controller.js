@@ -1,17 +1,24 @@
-import jwt from 'jsonwebtoken';
+import { StatusCodes } from 'http-status-codes';
 import * as userService from '../services/user.service';
 import * as tokenService from '../services/token.service';
 import config from '../config/config';
-import { User } from '../model/postgres/index';
-import { sendRegistrationMail } from '../utils/Mailer';
+import { Token, User } from '../model/postgres/index';
+import { sendRegistrationMail, sendResetPassword } from '../utils/Mailer';
+import { tokenTypes } from '../utils/Helpers';
+import { ApiError } from '../utils/ApiError';
 
 export const register = async (req, res, next) => {
     try {
         const user = await userService.createUser(req.body);
-        const emailToken = jwt.sign({ email: user.email }, config.jwtSecret, {
-            expiresIn: '1y',
-            algorithm: 'HS512',
+        // generate token with Math random
+        const emailToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
+        await Token.create({
+            userId: user.id,
+            token: emailToken,
+            type: tokenTypes.CONFIRM_EMAIL,
         });
+
         await sendRegistrationMail(req.body.email, emailToken);
         res.json({ id: user.id });
     } catch (err) {
@@ -33,18 +40,64 @@ export const login = async (req, res, next) => {
 export const validate = async (req, res, next) => {
     try {
         const { token } = req.query;
-        const { email } = jwt.verify(token, process.env.JWT_SECRET);
+        // find token include user
+        const tokenRecord = await Token.findOne({
+            where: {
+                token,
+                type: tokenTypes.CONFIRM_EMAIL,
+            },
+            include: [
+                {
+                    model: User,
+                    as: 'user',
+                },
+            ],
+        });
+
+        // delete token
+        await tokenRecord.destroy();
+
         await User.update(
             {
-                validate: true,
+                active: true,
             },
             {
-                where: { email },
+                where: { email: tokenRecord?.user?.email },
                 returning: true,
                 individualHooks: true,
             },
         );
-        res.json({});
+        res.redirect(301, config.frontBaseUrl);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const resetPassword = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({
+            where: {
+                email,
+            },
+        });
+
+        console.log('🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩');
+        console.log(user);
+        console.log('🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦');
+
+        if (!user) {
+            throw new ApiError(StatusCodes.NOT_FOUND, 'Invalid email');
+        }
+
+        const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        await Token.create({
+            userId: user.id,
+            token,
+            type: tokenTypes.RESET_PASSWORD,
+        });
+        await sendResetPassword(email, token);
+        res.json({ id: user.id });
     } catch (err) {
         next(err);
     }

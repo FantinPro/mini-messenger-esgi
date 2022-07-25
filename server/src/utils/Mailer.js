@@ -10,11 +10,25 @@ export const sendRegistrationMail = async (email, token) => {
     const sendSmtpEmail = {
         to: [{
             email,
-            name: 'John Doe',
         }],
         templateId: 2,
         params: {
-            link: `${config.frontBaseUrl}/validate?token=${token}}`,
+            link: `${config.backBaseUrl}/auth/validate?token=${token}`,
+        },
+    };
+
+    return apiInstance.sendTransacEmail(sendSmtpEmail);
+};
+
+export const sendResetPassword = async (email, token) => {
+    const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+    const sendSmtpEmail = {
+        to: [{
+            email,
+        }],
+        templateId: 3,
+        params: {
+            link: `${config.frontBaseUrl}/reset-password?token=${token}`,
         },
     };
 
