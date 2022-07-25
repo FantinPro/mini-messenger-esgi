@@ -11,10 +11,10 @@ restart: stop start
 install: start
 	docker-compose exec node npm install
 
-client:
+client: install
 	docker-compose exec node npm --workspace client run development
 
-server:
+server: install
 	docker-compose exec node npm --workspace server run development
 
 migrate: start

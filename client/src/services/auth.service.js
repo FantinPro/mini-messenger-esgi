@@ -1,6 +1,5 @@
 import { httpMethodsWrapper } from '../helpers/http-methods-wrapper';
 import config from '../config/config';
-import { validate } from '../../../server/src/controllers/auth.controller';
 
 const baseUrl = `${config.apiUrl}/auth`;
 
