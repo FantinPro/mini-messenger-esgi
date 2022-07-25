@@ -33,9 +33,9 @@ export default function App() {
             user,
             setUser
         }} >
-            { !isLoading &&
+            {!isLoading &&
                 <Routes>
-                
+
                     <Route path="login" element={
                         user ? <Navigate to="/" /> : <Login />
                     } />
@@ -54,7 +54,9 @@ export default function App() {
                             </AuthRoute>
                         }
                     >
-                        <Route path="friends/:friendId" element={<Chat />} />
+                        <Route path="friends/:friendId" element={
+                            <Chat />
+                        } />
                     </Route>
 
                     <Route

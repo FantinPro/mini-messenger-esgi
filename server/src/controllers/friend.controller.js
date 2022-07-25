@@ -49,3 +49,14 @@ export const deleteFriend = async (req, res, next) => {
         next(e);
     }
 };
+
+export const getFriendChat = async (req, res, next) => {
+    try {
+        const { friendId } = req.params;
+        console.log(req.user)
+        const friendChat = await friendService.getFriendChat(friendId, req.user.id);
+        res.json(friendChat || {});
+    } catch (e) {
+        next(e);
+    }
+}

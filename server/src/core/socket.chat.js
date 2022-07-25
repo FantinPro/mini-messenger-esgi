@@ -1,18 +1,15 @@
 import { v4 as uuidv4 } from 'uuid';
+import * as messageService from '../services/message.service';
 
 const messages = new Set();
 const users = new Map();
-
-const defaultUser = {
-  id: 'anon',
-  name: 'Anonymous',
-};
 
 class Connection {
   constructor(io, socket) {
     this.socket = socket;
     this.io = io;
 
+    socket.on('login', (userId) => this.login(userId));
     socket.on('getMessages', () => this.getMessages());
     socket.on('message', (value) => this.handleMessage(value));
     socket.on('disconnect', () => this.disconnect());
@@ -21,8 +18,20 @@ class Connection {
     });
   }
 
-  sendMessage(message) {
-    this.io.sockets.emit('message', message);
+  login(userId) {
+    users.set(userId, this.socket);
+  }
+
+  async sendMessage(data) {
+    if (users.has(data.receiver.id)) {
+      this.io.sockets.to(users.get(data.receiver.id).id).emit('message', data);
+      this.io.sockets.to(users.get(data.sender.id).id).emit('message', data);
+    }
+    await messageService.createMessage({
+      text: data.text,
+      senderId: data.sender.id,
+      receiverId: data.receiver.id,
+    });
   }
 
   getMessages() {
@@ -32,9 +41,14 @@ class Connection {
   handleMessage(value) {
     const message = {
       id: uuidv4(),
-      user: users.get(this.socket) || defaultUser,
-      value,
-      time: Date.now()
+      text: value.text,
+      receiver: {
+        ...value.receiver
+      },
+      sender: {
+        ...value.sender
+      },
+      createdAt: Date.now()
     };
 
     messages.add(message);
