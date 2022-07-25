@@ -1,5 +1,5 @@
 import { Op } from 'sequelize';
-import { Friend, User } from '../model/postgres/index';
+import { Friend, User, Message } from '../model/postgres/index';
 import { friendsStatus } from '../utils/Helpers';
 
 export const getFriendsList = async (userId, status = [friendsStatus.ACTIVE, friendsStatus.PENDING]) => Friend.findAll({
@@ -12,20 +12,20 @@ export const getFriendsList = async (userId, status = [friendsStatus.ACTIVE, fri
                 receiverId: userId,
             },
         ],
-        [Op.or]: status.map((s) => ({
-            status: s,
-        })),
+        status: {
+            [Op.or]: status,
+        }
     },
     include: [
         {
             model: User,
             as: 'sender',
-            attributes: ['id', 'email', 'username'],
+            attributes: ['id', 'email', 'username', 'avatar']
         },
         {
             model: User,
             as: 'receiver',
-            attributes: ['id', 'email', 'username'],
+            attributes: ['id', 'email', 'username', 'avatar']
         },
     ],
 });
@@ -95,9 +95,9 @@ export const sendFriendInvitation = ({ senderId, receiverId }) => {
             };;
         }
     })
-    .catch((err) => {
-        console.log(err)
-    })
+        .catch((err) => {
+            console.log(err)
+        })
 };
 
 export const acceptFriendInvitation = (friendId) => Friend.update(
@@ -129,4 +129,46 @@ export const deleteFriend = (friendId) => Friend.destroy({
     where: {
         id: friendId,
     },
+});
+
+export const getFriendChat = (friendOneId, friendTwoId) => Message.findAll({
+    where: {
+        [Op.or]: [
+            {
+                senderId: friendOneId,
+                receiverId: friendTwoId,
+            },
+            {
+                senderId: friendTwoId,
+                receiverId: friendOneId,
+            },
+        ],
+    },
+    include: [
+        {
+            model: User,
+            as: 'sender',
+            attributes: ['id', 'email', 'username', 'avatar']
+        },
+        {
+            model: User,
+            as: 'receiver',
+            attributes: ['id', 'email', 'username', 'avatar']
+        }
+    ],
+}
+).then(async (messages) => {
+    const user = await User.findOne({
+        where: {
+            id: friendOneId
+        },
+        attributes: ['id', 'email', 'username', 'avatar']});
+
+    return {
+        friend: user,
+        messages,
+    }
+
+}).catch((err) => {
+    console.log(err)
 });

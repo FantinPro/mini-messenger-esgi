@@ -5,7 +5,10 @@ const baseUrl = `${config.apiUrl}/friends`;
 
 export const friendService = {
   getFriendsList,
-  addFriend
+  addFriend,
+  acceptFriend,
+  deleteFriend,
+  getFriendChat,
 };
 
 function getFriendsList(userId) {
@@ -16,4 +19,16 @@ function addFriend(friendId) {
   return httpMethodsWrapper.post(`${baseUrl}/add`, {
     receiverNameOrEmail: friendId
   });
+}
+
+function acceptFriend(friendId) {
+  return httpMethodsWrapper.put(`${baseUrl}/${friendId}`);
+}
+
+function deleteFriend(friendId) {
+  return httpMethodsWrapper.delete(`${baseUrl}/${friendId}`);
+}
+
+function getFriendChat(friendId) {
+  return httpMethodsWrapper.get(`${baseUrl}/${friendId}/chat`);
 }

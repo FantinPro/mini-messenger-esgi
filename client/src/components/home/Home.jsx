@@ -6,13 +6,13 @@ import Sidebar from './Sidebar/Sidebar';
 
 function Home() {
 
-    const sidebarWith = React.useMemo(() => 400, []);
+    const sidebarWith = React.useMemo(() => 350, []);
 
     return (
         <Box sx={{ display: 'flex' }}>
             <Sidebar sidebarWith={sidebarWith} />
             <Box component="main"
-                sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${sidebarWith}px)` } }}>
+                sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${sidebarWith}px)` }, flex: '1 1 auto' }}>
 
                 <Toolbar />
 

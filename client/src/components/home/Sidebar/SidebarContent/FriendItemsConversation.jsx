@@ -28,6 +28,7 @@ export default function FriendItemsConversation() {
                     break;
                 case 'ADDED':
                     setError({ message: "Friend request sent successfully !", severity: 'success' });
+                    loadFriendList();
                     break;
                 case 'PENDING':
                     setError({ message: "You already sent a request !", severity: 'success' });
@@ -48,7 +49,8 @@ export default function FriendItemsConversation() {
         setOpen(false);
     }
 
-    useEffect(() => {
+    const loadFriendList = () => {
+        setIsLoading(true);
         friendService.getFriendsList(user.id).then(res => {
             setFriends(res);
         }).catch(err => {
@@ -56,6 +58,10 @@ export default function FriendItemsConversation() {
         }).finally(() => {
             setIsLoading(false);
         })
+    }
+
+    useEffect(() => {
+        loadFriendList();
     }, []);
 
     return (
@@ -76,7 +82,7 @@ export default function FriendItemsConversation() {
                     <hr></hr>
                 </Box>
                 {friends.map((friend, index) => (
-                    <FriendItem key={index} friendId={friend.id} />
+                    <FriendItem key={index} friend={friend} loadFriendList={loadFriendList} />
                 ))}
             </List>
             <Dialog open={open} onClose={closeAddFriendModal}>
@@ -119,28 +125,102 @@ export default function FriendItemsConversation() {
     )
 }
 
-const FriendItem = ({ name, avatar, lastMessage, friendId }) => {
+const FriendItem = (props) => {
+    const { user } = useContext(UserContext);
     const navigate = useNavigate()
+    const friend = props.friend.sender.id === user.id ? props.friend.receiver : props.friend.sender;
+    // If pendingRequest is 1, the user is the receiver else 2 if it is the sender else it is 0 when active
+    let pendingRequest = 0;
+    if (props.friend.status === 'PENDING') {
+        if (props.friend.receiverId === user.id) {
+            pendingRequest = 1;
+        } else if (props.friend.senderId === user.id) {
+            pendingRequest = 2;
+        }
+    }
+
     return (
-        <ListItem button onClick={() => navigate(`friends/${friendId}`)} alignItems="flex-start">
-            <ListItemAvatar>
-                <Avatar alt="Remy Sharp" src={avatar || 'https://avatars.dicebear.com/api/male/2.svg'} />
-            </ListItemAvatar>
-            <ListItemText
-                primary={name}
-                secondary={
-                    <React.Fragment>
-                        <Typography
-                            sx={{ display: 'inline' }}
-                            component="span"
-                            variant="body2"
-                            color="text.primary"
-                        >
-                            {lastMessage}
-                        </Typography>
-                    </React.Fragment>
-                }
-            />
-        </ListItem>
+        // If friendship is active
+        (pendingRequest === 0 ?
+            <ListItem button onClick={() => navigate(`friends/${friend.id}`)} alignItems="flex-start">
+                <ListItemAvatar>
+                    <Avatar alt={friend.username} src={friend.avatar || 'https://avatars.dicebear.com/api/male/2.svg'} />
+                </ListItemAvatar>
+                <ListItemText
+                    primary={friend.username || 'DeletedUser'}
+                    secondary={
+                        <React.Fragment>
+                            <Typography
+                                sx={{ display: 'inline' }}
+                                component="span"
+                                variant="body2"
+                                color="text.primary"
+                            >
+                                {friend.lastMessage}
+                            </Typography>
+                        </React.Fragment>
+                    }
+                />
+            </ListItem>
+            :
+            // If friendship is pending for user interaction
+            (pendingRequest === 1 ?
+                <ListItem button alignItems="flex-start" width="100%">
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }} >
+                        <Box sx={{ display: 'flex' }}>
+                            <ListItemAvatar>
+                                <Avatar alt={friend.username} src={friend.avatar || 'https://avatars.dicebear.com/api/male/2.svg'} />
+                            </ListItemAvatar>
+                            <ListItemText
+                                primary={friend.username || 'DeletedUser'}
+                            />
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space', alignItems: 'center' }}>
+                            <Button variant='contained' color='primary' sx={{ marginRight: '15px' }} onClick={() => {
+                                friendService.acceptFriend(props.friend.id).finally(() => {
+                                    props.loadFriendList();
+                                })
+                            }}>Accept</Button>
+                            <Button variant='contained' color='secondary' onClick={() => {
+                                friendService.deleteFriend(props.friend.id).finally(() => {
+                                    props.loadFriendList();
+                                })
+                            }}>Delete</Button>
+                        </Box>
+                    </Box>
+                </ListItem>
+                :
+                // If friendship is pending for answer
+                <ListItem button alignItems="flex-start" width="100%">
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }} >
+                        <ListItemAvatar>
+                            <Avatar alt={friend.username} src={friend.avatar || 'https://avatars.dicebear.com/api/male/2.svg'} />
+                        </ListItemAvatar>
+                        <ListItemText
+                            primary={friend.username || 'DeletedUser'}
+                            secondary={
+                                <React.Fragment>
+                                    <Typography
+                                        sx={{ display: 'inline' }}
+                                        component="span"
+                                        variant="body2"
+                                        color="text.secondary"
+                                    >
+                                        <i>Friend request has been sent, waiting for answer</i>
+                                    </Typography>
+                                </React.Fragment>
+                            }
+                        />
+                        <Box sx={{ display: 'flex', justifyContent: 'space', alignItems: 'center' }}>
+                            <Button variant='contained' color='secondary' onClick={() => {
+                                friendService.deleteFriend(props.friend.id).finally(() => {
+                                    props.loadFriendList();
+                                })
+                            }}>Cancel</Button>
+                        </Box>
+                    </Box>
+                </ListItem >
+            )
+        )
     )
 }
