@@ -38,7 +38,7 @@ export const createUser = async (userBody) => {
 };
 
 export const loginUserWithEmailAndPassword = async (email, password) => {
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ where: { email }, include: [{ model: Interest, as: 'interests' }] });
     if (!user) {
         throw new ApiError(StatusCodes.UNAUTHORIZED, 'Incorrect credentials');
     }

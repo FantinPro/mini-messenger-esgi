@@ -4,12 +4,14 @@ import Container from '@mui/material/Container';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import logo from '../../../assets/images/messenger.png';
 import NavTabs from './NavTabs/NavTabs';
 
 
 export default function Admin () {
+
+    const navigate = useNavigate();
 
     return (
         <Box sx={
@@ -25,7 +27,9 @@ export default function Admin () {
             >
                 {/* Top NavBar */}
                 <Toolbar sx={{ justifyContent: 'space-between'}}>
-                    <Box sx={{ display: 'flex'}}>
+                    <Box 
+                        onClick={() => navigate('/')}
+                        sx={{ display: 'flex', cursor: 'pointer'}}>
                         <img src={logo} width='40' />
                         <Typography alignSelf='center' ml={2} variant="h6" noWrap component="div">
                             Admin 🔑

@@ -36,18 +36,18 @@ export default function Chat() {
     }, [setSocket]);
 
     return (
-        <div>
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             {socket && friend ? (
-                <>
+                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                     <h2>@ {friend.username}</h2>
-                    <Box sx={{ display: 'flex', height: '100%', flexDirection: 'column', flex: '1 1 auto' }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto' }}>
                         <Messages socket={socket} oldMessages={messages} friend={friend} sx={{ flex: '1 1 auto' }} />
                         <MessageInput socket={socket} friend={friend} fixed sx={{ bottom: '0px'}} />
                     </Box>
-                </>
+                </Box>
             ) : (
                 <div>Not Connected</div>
             )}
-        </div>
+        </Box>
     );
 }

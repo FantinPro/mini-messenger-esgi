@@ -4,11 +4,18 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import config from './config';
 import * as usersService from '../services/user.service';
 import * as tokensService from '../services/token.service';
-import { User } from '../model/postgres/index';
+import { Interest, User } from '../model/postgres/index';
 
 const jwtVerify = async (payload, done) => {
     try {
-        const user = await User.findByPk(payload.id);
+        const user = await User.findByPk(payload.id, {
+            include: [
+                {
+                    model: Interest,
+                    as: 'interests',
+                },
+            ],
+        });
         if (!user) {
             return done(null, false);
         }

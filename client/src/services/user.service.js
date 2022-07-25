@@ -5,6 +5,8 @@ const baseUrl = `${config.apiUrl}/users`;
 
 export const userService = {
     getUserByToken,
+    resetPassword,
+    updateProfile,
     updatePassword
 };
 
@@ -15,6 +17,14 @@ function getUserByToken() {
     return httpMethodsWrapper.get(`${baseUrl}/token`);
 }
 
-function updatePassword(token, password) {
+function resetPassword(token, password) {
     return httpMethodsWrapper.post(`${baseUrl}/reset-password`, { token, password });
+}
+
+function updateProfile({  username, interests }) {
+    return httpMethodsWrapper.put(`${baseUrl}/profile`, { username, interests });
+}
+
+function updatePassword(oldPassword, newPassword) {
+    return httpMethodsWrapper.put(`${baseUrl}/password`, { oldPassword, newPassword });
 }

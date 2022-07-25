@@ -20,7 +20,7 @@ server: install
 migrate: start
 	docker-compose exec node npm --workspace server run migrate
 
-fixtures: start
+fixtures: migrate
 	docker-compose exec node npm --workspace server run fixtures
 
 production: install

@@ -33,7 +33,7 @@ export default function ResetPassword() {
         },
         validationSchema: validationSchemaResetPassword,
         onSubmit: ({ password }, { setStatus }) => {
-            userService.updatePassword(token, password).then(res => {
+            userService.resetPassword(token, password).then(res => {
                 navigate("/login")
             }).catch((err) => {
                 let customError = "Something went wrong";

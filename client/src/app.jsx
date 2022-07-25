@@ -8,10 +8,11 @@ import Login from './components/auth/Login';
 import Logout from './components/auth/Logout';
 import Register from './components/auth/Register';
 import Home from './components/home/Home';
-import Chat from './components/home/Main/Chat';
+import Chat from './components/home/Chat/Chat';
 import { UserContext } from './contexts/user.context';
 import { userService } from './services/user.service';
 import ResetPassword from './components/auth/ResetPassword';
+import Profile from './components/home/Profile/Profile';
 
 export default function App() {
 
@@ -54,6 +55,7 @@ export default function App() {
                             </AuthRoute>
                         }
                     >
+                        <Route path="profile" element={<Profile />} />
                         <Route path="friends/:friendId" element={
                             <Chat />
                         } />
@@ -61,7 +63,10 @@ export default function App() {
 
                     <Route
                         element={
-                            <Admin />
+                            <AuthRoute role="ROLE_ADMIN" >
+                                <Admin />
+                            </AuthRoute>
+                            
                         }>
                         {/* default route is Logs */}
                         <Route path="admin/logs" element={<Logs />} />

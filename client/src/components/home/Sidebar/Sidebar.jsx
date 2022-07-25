@@ -6,6 +6,7 @@ import BottomNavigationSidebar from './BottomNavigationSideBar/BottomNavigationS
 import logo from '../../../../assets/images/messenger.png';
 import { UserContext } from '../../../contexts/user.context';
 import { useNavigate } from 'react-router-dom';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 
 export default function Sidebar({ sidebarWith }) {
 
@@ -56,7 +57,20 @@ export default function Sidebar({ sidebarWith }) {
                             Messenger
                         </Typography>
                     </Box>
+                    
                     <Box sx={{ display: 'flex' }}>
+                        {user.role === 'ROLE_ADMIN' && 
+                            <Button 
+                                onClick={() => navigate('/admin')}
+                                sx={{
+                                    marginRight: '2rem',
+                                }} color='inherit' 
+                                startIcon={<AdminPanelSettingsIcon  
+                                />}>
+                                Admin
+                            </Button>
+                        }
+                        
                         <p style={{ marginRight: '10px', fontWeight: 'bold' }}>{user.username}</p>
                         <IconButton
                             id="basic-button"
@@ -77,10 +91,9 @@ export default function Sidebar({ sidebarWith }) {
                                 'aria-labelledby': 'basic-button',
                             }}
                         >
-                            <MenuItem onClick={handleClose}>Profile</MenuItem>
-                            <MenuItem onClick={handleClose}>My account</MenuItem>
+                            <MenuItem onClick={() => navigate('/profile')}>Profile</MenuItem>
                             <MenuItem onClick={handleLogout}>Logout</MenuItem>
-                            
+
                         </Menu>
                     </Box>
                 </Toolbar>

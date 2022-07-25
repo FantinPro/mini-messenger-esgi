@@ -13,7 +13,7 @@ export const sendRegistrationMail = async (email, token) => {
         }],
         templateId: 2,
         params: {
-            link: `${config.backBaseUrl}/auth/validate?token=${token}`,
+            link: `${config.backBaseUrl}/api/v1/auth/validate?token=${token}`,
         },
     };
 
