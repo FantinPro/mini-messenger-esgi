@@ -8,6 +8,7 @@ import * as yup from 'yup';
 import { UserContext } from '../../contexts/user.context';
 import { authService } from '../../services/auth.service';
 import logo from '../../../assets/images/messenger.png';
+import { io } from 'socket.io-client';
 
 const style = {
     position: 'absolute',
@@ -41,7 +42,7 @@ const validationSchemaResetPassword = yup.object({
 
 export default function Login() {
 
-    const { setUser } = useContext(UserContext);
+    const { setUser, setSocket } = useContext(UserContext);
 
     const navigate = useNavigate();
 
@@ -67,6 +68,10 @@ export default function Login() {
                 .login(email, password)
                 .then((res) => {
                     setUser(res.user);
+                    const newSocket = io(`http://${window.location.hostname}:9000`, {
+                        query: { userId: res.user.id }
+                    });
+                    setSocket(newSocket);
                     setStatus(null);
                     navigate('/');
                 })

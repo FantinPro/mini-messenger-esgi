@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Admin from './components/admin/Admin';
 import Logs from './components/admin/AdminContent/Logs/Logs.jsx';
@@ -13,68 +13,85 @@ import { UserContext } from './contexts/user.context';
 import { userService } from './services/user.service';
 import ResetPassword from './components/auth/ResetPassword';
 import Profile from './components/home/Profile/Profile';
+import Analytics from "./components/admin/AdminContent/Analytics/AnalyticsTable";
+import { io } from "socket.io-client";
 
 export default function App() {
 
     const [user, setUser] = useState(null);
+    const [socket, setSocket] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        userService.getUserByToken().then(res => {
-            setUser(res);
+        userService.getUserByToken().then(res => {        
+            if (res) {
+                setUser(res);
+                const newSocket = io(`http://${window.location.hostname}:9000`, {
+                    query: { userId: res.id }
+                });
+                setSocket(newSocket);
+                console.log('start')
+            }
         }).catch(err => {
             setUser(null);
         }).finally(() => {
+            console.log('finally');
             setIsLoading(false);
         })
     }, []);
 
     return (
-        <UserContext.Provider value={{
-            user,
-            setUser
-        }} >
+        <>
             {!isLoading &&
-                <Routes>
+                <UserContext.Provider value={{
+                    user,
+                    setUser,
+                    socket,
+                    setSocket
+                }} >
+                    
+                    <Routes>
 
-                    <Route path="login" element={
-                        user ? <Navigate to="/" /> : <Login />
-                    } />
-                    <Route path="register" element={
-                        user ? <Navigate to="/" /> : <Register />
-                    } />
-                    <Route path="/logout" element={<Logout />} />
-
-                    <Route path="/reset-password" element={<ResetPassword />} />
-
-                    <Route
-                        path="/"
-                        element={
-                            <AuthRoute >
-                                <Home />
-                            </AuthRoute>
-                        }
-                    >
-                        <Route path="profile" element={<Profile />} />
-                        <Route path="friends/:friendId" element={
-                            <Chat />
+                        <Route path="login" element={
+                            user ? <Navigate to="/" /> : <Login />
                         } />
-                    </Route>
+                        <Route path="register" element={
+                            user ? <Navigate to="/" /> : <Register />
+                        } />
+                        <Route path="/logout" element={<Logout />} />
 
-                    <Route
-                        element={
-                            <AuthRoute role="ROLE_ADMIN" >
-                                <Admin />
-                            </AuthRoute>
-                            
-                        }>
-                        {/* default route is Logs */}
-                        <Route path="admin/logs" element={<Logs />} />
-                        <Route path="admin/reports" element={<Reports />} />
-                        <Route path="admin" element={<Navigate to="logs" />} />
-                    </Route>
-                </Routes>
+                        <Route path="/reset-password" element={<ResetPassword />} />
+
+                        <Route
+                            path="/"
+                            element={
+                                <AuthRoute >
+                                    <Home />
+                                </AuthRoute>
+                            }
+                        >
+                            <Route path="profile" element={<Profile />} />
+                            <Route path="friends/:friendId" element={
+                                <Chat />
+                            } />
+                        </Route>
+
+                        <Route
+                            element={
+                                <AuthRoute role="ROLE_ADMIN" >
+                                    <Admin />
+                                </AuthRoute>
+                                
+                            }>
+                            {/* default route is Logs */}
+                            <Route path="admin/logs" element={<Logs />} />
+                            <Route path="admin/reports" element={<Reports />} />
+                            <Route path="admin/analytics" element={<Analytics />} />
+                            <Route path="admin" element={<Navigate to="logs" />} />
+                        </Route>
+                    </Routes>
+                </UserContext.Provider>
             }
-        </UserContext.Provider>
+        </>
     );
 }

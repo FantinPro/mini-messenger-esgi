@@ -11,7 +11,7 @@ import { SidebarContext } from '../../../contexts/sidebar.context';
 
 export default function Sidebar({ sidebarWith }) {
 
-    const { user } = useContext(UserContext);
+    const { user, socket } = useContext(UserContext);
 
     const { sidebarOpen, setSidebarOpen } = useContext(SidebarContext)
 
@@ -19,6 +19,7 @@ export default function Sidebar({ sidebarWith }) {
     const navigate = useNavigate();
 
     const handleLogout = () => {
+        socket.close()
         navigate('/logout');
     }
 

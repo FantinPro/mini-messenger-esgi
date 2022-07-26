@@ -9,12 +9,19 @@ class Connection {
     this.socket = socket;
     this.io = io;
 
-    socket.on('login', (userId) => this.login(userId));
+    this.login(socket.handshake.query.userId);
+    this.io.sockets.emit('users.count', users.size);
+    
     socket.on('getMessages', () => this.getMessages());
     socket.on('message', (value) => this.handleMessage(value));
-    socket.on('disconnect', () => this.disconnect());
+    socket.on('deleteUser', (userId) => this.deleteUser(userId));
     socket.on('connect_error', (err) => {
       console.log(`connect_error due to ${err.message}`);
+    });
+    
+    socket.on('disconnect', () => {
+      users.delete(this.socket.handshake.query.userId);
+      io.sockets.emit('users.count', users.size);
     });
   }
 
@@ -60,8 +67,8 @@ class Connection {
     this.io.sockets.emit('deleteMessage', messageId);
   }
 
-  disconnect() {
-    users.delete(this.socket);
+  deleteUser(userId) {
+    users.delete(userId);
   }
 }
 

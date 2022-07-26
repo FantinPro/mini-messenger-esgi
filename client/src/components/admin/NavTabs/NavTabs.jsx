@@ -26,6 +26,9 @@ export default function NavTabs() {
         case 1:
             navigate('/admin/reports');
             break;
+        case 2:
+            navigate('/admin/analytics');
+            break;
         default:
 
             break;
@@ -38,6 +41,7 @@ export default function NavTabs() {
                 <Tabs value={navigationIndex} onChange={handleNav} aria-label="basic tabs example">
                     <Tab label="Logs" {...a11yProps(0)} />
                     <Tab label="Reports" {...a11yProps(1)} />
+                    <Tab label="Analytics" {...a11yProps(2)} />
                 </Tabs>
             </Box>
         </Box>

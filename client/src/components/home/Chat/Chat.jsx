@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
-import { io } from "socket.io-client";
 import Messages from './Messages';
 import MessageInput from './MessageInput';
 import { friendService } from '../../../services/friend.service';
@@ -9,11 +8,10 @@ import { Box, Typography, Divider } from '@mui/material';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 
 export default function Chat() {
-    const [socket, setSocket] = useState(null);
+    const { socket } = useContext(UserContext)
     let params = useParams();
     const [messages, setMessages] = useState([]);
     const [friend, setFriend] = useState({});
-    const { user } = useContext(UserContext);
 
     useEffect(() => {
         const loadFriendChat = async () => {
@@ -27,13 +25,6 @@ export default function Chat() {
 
         loadFriendChat();
     }, [params]);
-
-    useEffect(() => {
-        const newSocket = io(`http://${window.location.hostname}:9000`);
-        setSocket(newSocket);
-        newSocket.emit('login', user.id);
-        return () => newSocket.close();
-    }, [setSocket]);
 
     return (
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
