@@ -2,7 +2,7 @@ import { VisibilityOff, Visibility } from '@mui/icons-material';
 import { Box, Button, Container, FormControl, FormHelperText, IconButton, InputAdornment, InputLabel, Modal, OutlinedInput, Typography, Alert } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { useFormik } from 'formik';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
 import { UserContext } from '../../contexts/user.context';
@@ -188,7 +188,7 @@ export default function Login() {
 
                     <Button sx={{
                         marginTop: '1rem'
-                    }} fullWidth variant="contained" type='submit'>Login</Button>
+                    }} fullWidth variant="contained" type='submit' onTouchStart={() => formikLogin.handleSubmit}>Login</Button>
                     <Typography mt={2} variant="subtitle1" gutterBottom component="div">
                         Don&apos;t have an account yet ?
                     </Typography>
