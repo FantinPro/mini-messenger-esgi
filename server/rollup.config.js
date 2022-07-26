@@ -7,7 +7,7 @@ export default {
     plugins: [
         external(),
         process.env.NODE_ENV === 'development' && run(),
-        process.env.NODE_ENV === 'production' && terser(),
+        process.env.NODE_ENV === 'production' && terser() && run(),
     ],
     output: {
         file: '../build/server/server.js',
