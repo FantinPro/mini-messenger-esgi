@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { Paper, Box, Typography } from '@mui/material';
+import React, { useEffect, useState, useContext, useRef } from 'react';
+import { Paper, Box, Typography, List, ListItem } from '@mui/material';
 import DOMPurify from 'dompurify';
 import { UserContext } from '../../../contexts/user.context';
 import { useParams } from 'react-router-dom';
@@ -8,6 +8,7 @@ function Messages({ socket, oldMessages }) {
     const { user } = useContext(UserContext);
     const [messages, setMessages] = useState([]);
     let params = useParams();
+    const bottomRef = useRef(null);
 
     useEffect(() => {
         setMessages(oldMessages);
@@ -15,7 +16,6 @@ function Messages({ socket, oldMessages }) {
 
     useEffect(() => {
         const messageListener = (message) => {
-            console.log(message, user.id)
             if (message.sender.id === params.friendId || message.sender.id === user.id) {
                 setMessages((prevMessages) => {
                     const newMessages = { ...prevMessages };
@@ -24,6 +24,7 @@ function Messages({ socket, oldMessages }) {
                 });
             }
         };
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
 
         const deleteMessageListener = (messageID) => {
             setMessages((prevMessages) => {
@@ -41,7 +42,7 @@ function Messages({ socket, oldMessages }) {
             socket.off('message', messageListener);
             socket.off('deleteMessage', deleteMessageListener);
         };
-    }, [socket, params]);
+    }, [socket, params, messages]);
 
     const sanitizedData = (data) => ({
         __html: DOMPurify.sanitize(data)
@@ -63,7 +64,7 @@ function Messages({ socket, oldMessages }) {
             {[...Object.values(messages)]
                 .sort((a, b) => a.createdAt - b.createdAt)
                 .map((message) => (
-                    <Box sx={{ display: 'box', marginY: '15px' }} key={message.id}>
+                    <Box sx={{ display: 'box', marginY: '15px', marginX: '15px' }} key={message.id}>
                         <Typography
                             sx={{ display: 'inline' }}
                             component="span"
@@ -80,12 +81,12 @@ function Messages({ socket, oldMessages }) {
                             variant="subtitle2"
                             color="text.secondary"
                         >
-                            {`${daysBetween(message.createdAt) === 0 
-                                ? ' Today' 
-                                : daysBetween(message.createdAt) === -1 
+                            {`${daysBetween(message.createdAt) === 0
+                                ? ' Today'
+                                : daysBetween(message.createdAt) === -1
                                     ? ' Yesterday '
                                     : `${new Date(message.createdAt).toLocaleDateString()}`
-                            } at ${new Date(message.createdAt).toLocaleTimeString()}`}
+                                } at ${new Date(message.createdAt).toLocaleTimeString()}`}
                         </Typography>
                         <Paper
                             elevation={1}
@@ -96,6 +97,7 @@ function Messages({ socket, oldMessages }) {
                     </Box>
                 ))
             }
+            <div ref={bottomRef} />
         </Box>
     );
 }

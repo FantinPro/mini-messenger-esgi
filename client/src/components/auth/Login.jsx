@@ -188,7 +188,7 @@ export default function Login() {
 
                     <Button sx={{
                         marginTop: '1rem'
-                    }} fullWidth variant="contained" type='submit'>Login</Button>
+                    }} fullWidth variant="contained" type='submit' onTouchStart={() => formikLogin.handleSubmit}>Login</Button>
                     <Typography mt={2} variant="subtitle1" gutterBottom component="div">
                         Don&apos;t have an account yet ?
                     </Typography>

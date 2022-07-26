@@ -5,6 +5,8 @@ import { friendService } from '../../../../services/friend.service';
 import { UserContext } from '../../../../contexts/user.context';
 import { useForm, Controller } from 'react-hook-form';
 import { SidebarContext } from '../../../../contexts/sidebar.context';
+import DeleteIcon from '@mui/icons-material/Delete';
+import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 
 export default function FriendItemsConversation() {
     const { user } = useContext(UserContext);
@@ -187,12 +189,12 @@ const FriendItem = (props) => {
                                 friendService.acceptFriend(props.friend.id).finally(() => {
                                     props.loadFriendList();
                                 })
-                            }}>Accept</Button>
+                            }}><PersonAddAlt1Icon /></Button>
                             <Button variant='contained' color='secondary' onClick={() => {
                                 friendService.deleteFriend(props.friend.id).finally(() => {
                                     props.loadFriendList();
                                 })
-                            }}>Delete</Button>
+                            }}><DeleteIcon /></Button>
                         </Box>
                     </Box>
                 </ListItem>
@@ -223,7 +225,7 @@ const FriendItem = (props) => {
                                 friendService.deleteFriend(props.friend.id).finally(() => {
                                     props.loadFriendList();
                                 })
-                            }}>Cancel</Button>
+                            }}><DeleteIcon /></Button>
                         </Box>
                     </Box>
                 </ListItem >

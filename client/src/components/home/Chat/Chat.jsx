@@ -5,7 +5,8 @@ import Messages from './Messages';
 import MessageInput from './MessageInput';
 import { friendService } from '../../../services/friend.service';
 import { UserContext } from '../../../contexts/user.context';
-import { Box } from '@mui/material';
+import { Box, Typography, Divider } from '@mui/material';
+import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 
 export default function Chat() {
     const [socket, setSocket] = useState(null);
@@ -13,8 +14,7 @@ export default function Chat() {
     const [messages, setMessages] = useState([]);
     const [friend, setFriend] = useState({});
     const { user } = useContext(UserContext);
-    
-    
+
     useEffect(() => {
         const loadFriendChat = async () => {
             if (friend.id === params.friendId) return;
@@ -39,10 +39,22 @@ export default function Chat() {
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             {socket && friend ? (
                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                    <h2>@ {friend.username}</h2>
+            
+                    <Box sx={{ display: 'flex', flexDirection: 'row', padding: '8px', alignItems: 'center', height: '48px' }}>
+                    <AlternateEmailIcon sx={{ color: 'gray', height: '24px'}} />
+                        <Typography
+                            sx={{ display: 'inline', fontWeight: '500', fontSize: '16px', marginX: '8px' }}
+                            component="span"
+                            variant="h3"
+                            color="text.primary"
+                        >
+                             {friend.username}
+                        </Typography>
+                    </Box>
+                        <Divider />
                     <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto' }}>
                         <Messages socket={socket} oldMessages={messages} friend={friend} sx={{ flex: '1 1 auto' }} />
-                        <MessageInput socket={socket} friend={friend} fixed sx={{ bottom: '0px'}} />
+                        <MessageInput socket={socket} friend={friend} fixed sx={{ bottom: '0px', margin: '10px' }} />
                     </Box>
                 </Box>
             ) : (
