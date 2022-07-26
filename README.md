@@ -4,12 +4,14 @@
 ## Client
 
 ```bash
+(before do: "make start" to up your containers)
 make client
 ```
 
 ## Server
 
 ```bash
+(before do: "make start" to up your containers)
 make server
 ```
 
