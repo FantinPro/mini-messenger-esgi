@@ -1,4 +1,4 @@
 const config = {
-    apiUrl: 'http://localhost:9000/api/v1',
+    apiUrl: 'https://messenger.zhenzhen.fr/api/v1',
 };
 export default config;

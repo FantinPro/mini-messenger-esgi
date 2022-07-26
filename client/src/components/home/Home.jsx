@@ -6,7 +6,7 @@ import Sidebar from './Sidebar/Sidebar';
 
 function Home() {
 
-    const sidebarWith = React.useMemo(() => 350, []);
+    const sidebarWith = React.useMemo(() => 320, []);
 
     return (
         <Box sx={{ display: 'flex', minHeight: 'inherit' }}>

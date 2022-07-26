@@ -1,10 +1,13 @@
-.PHONY: start stop restart client server migrate fixtures install production run
+.PHONY: setup start stop restart client server migrate fixtures install production run cl sr
+
+setup:
+	docker-compose up --detach node nginx postgres mongodb adminer certbot
 
 start:
-	docker-compose up --detach
+	docker-compose up --detach node nginx postgres mongodb adminer
 
 stop:
-	docker-compose down --remove-orphans --volumes --timeout 0
+	docker-compose down --remove-orphans --timeout 0
 
 restart: stop start
 
@@ -15,6 +18,12 @@ client:
 	docker-compose exec node npm --workspace client run development
 
 server:
+	docker-compose exec node npm --workspace server run development
+
+cl:
+	docker-compose exec node npm --workspace client run development
+
+sr:
 	docker-compose exec node npm --workspace server run development
 
 migrate: start

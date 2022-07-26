@@ -3,15 +3,18 @@ version: "3"
 services:
   node:
     image: node:17.0.0-alpine
+    container_name: node
     user: node
     entrypoint: node
     tty: true
     stdin_open: true
     working_dir: /home/node
     env_file: .env
+    restart: always
     ports:
       - $SERVER_PORT:$SERVER_PORT
       - $CLIENT_PORT:$CLIENT_PORT
+      - 7000:7000
     volumes:
       - .:/home/node
     depends_on:
@@ -21,22 +24,24 @@ services:
 
   postgres:
       image: postgres:13-alpine
+      container_name: postgres
       restart: always
       environment:
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: mini-messenger
-          POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: mini-messenger
+        POSTGRES_USER: postgres
       volumes:
         - ./db-data-postgres:/var/lib/postgresql/data:rw
+        - ./docker/pg_hba.conf:/var/lib/postgresql/pg_hba.conf
       ports:
-        - target: 5432
-          published: 5432
-          protocol: tcp
+        - 5432:5432
       networks:
         - mini-messenger
 
   mongodb:
       image: mongo:4.2.1-bionic
+      container_name: mongodb
+      restart: always
       ports:
         - '27017:27017'
       volumes:
@@ -46,11 +51,55 @@ services:
 
   adminer:
       image: adminer
+      container_name: 'adminer'
       restart: always
       ports:
         - 8080:8080
       networks:
         - mini-messenger
+
+  nginx:
+      image: nginx:mainline-alpine
+      container_name: nginx
+      restart: unless-stopped
+      ports:
+        - 80:80
+        - 443:443
+      volumes:
+        - web-root:/var/www/html
+        - ./docker/nginx-conf:/etc/nginx/conf.d
+        - certbot-etc:/etc/letsencrypt
+        - certbot-var:/var/lib/letsencrypt
+        - ./docker/dhparam:/etc/ssl/certs
+      depends_on:
+        - node
+
+  certbot:
+    image: certbot/certbot:arm32v6-latest
+    container_name: certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    depends_on:
+      - nginx
+    command: certonly --webroot --webroot-path=/var/www/html --email geekwid@gmail.com --agree-tos --no-eff-email --staging -d messenger.zhenzhen.fr  -d www.messenger.zhenzhen.fr
+
+volumes:
+  certbot-etc:
+  certbot-var:
+  web-root:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/esgi/Soutenances/mini-messenger/docker/views/
+      o: bind
+  dhparam:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/esgi/Soutenances/mini-messenger/docker/dhparam/
+      o: bind
 
 networks:
   mini-messenger:

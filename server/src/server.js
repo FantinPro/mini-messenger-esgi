@@ -21,33 +21,24 @@ server.use(
         origin: config.frontBaseUrl, // only allow front call
     }),
 );
-
 server.use(bodyParser.json());
-
 morganBody(server, {
     logResponseBody: true,
 });
-
 server.use(express.json());
-
 passportConfig.initialize(server);
-
 server.use(compression({
     level: 9,
 }));
-
 // If you want to make a render from the server, you can uncomments this line
 // server.use(express.static(process.env.NODE_ENV === 'development' ? '../build/client' : './build/client'));
-
 server.use('/api/v1', routes);
-
 server.get(
     '/api/v1/auth/google',
     passport.authenticate('google', {
         scope: ['email', 'profile'],
     }),
 );
-
 // Redirect to front, (you'll need to make a request with the token inside the query param)
 // make the request to --> GET: /users/token (put the token in AUTHORIZATION header, started by bearer)
 server.get(
@@ -66,7 +57,6 @@ server.get(
         }
     },
 );
-
 server.use(errorHandler);
 
 const app = createServer(server);
