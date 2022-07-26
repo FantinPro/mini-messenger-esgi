@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { io } from "socket.io-client";
 import Messages from './Messages';
-import MessageInput from './MessajgeInput';
+import MessageInput from './MessageInput';
 import { friendService } from '../../../services/friend.service';
 import { UserContext } from '../../../contexts/user.context';
 import { Box, Typography, Divider } from '@mui/material';
