@@ -2,7 +2,7 @@ import { VisibilityOff, Visibility } from '@mui/icons-material';
 import { Box, Button, Container, FormControl, FormHelperText, IconButton, InputAdornment, InputLabel, Modal, OutlinedInput, Typography, Alert } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { useFormik } from 'formik';
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
 import { UserContext } from '../../contexts/user.context';
