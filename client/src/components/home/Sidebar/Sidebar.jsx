@@ -7,18 +7,16 @@ import logo from '../../../../assets/images/messenger.png';
 import { UserContext } from '../../../contexts/user.context';
 import { useNavigate } from 'react-router-dom';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import { SidebarContext } from '../../../contexts/sidebar.context';
 
 export default function Sidebar({ sidebarWith }) {
 
     const { user } = useContext(UserContext);
 
-    const [mobileOpen, setMobileOpen] = useState(false);
+    const { sidebarOpen, setSidebarOpen } = useContext(SidebarContext)
+
     const [navigationIndex, setNavigationIndex] = useState(0);
     const navigate = useNavigate();
-
-    const handleDrawerToggle = () => {
-        setMobileOpen(!mobileOpen);
-    };
 
     const handleLogout = () => {
         navigate('/logout');
@@ -46,16 +44,19 @@ export default function Sidebar({ sidebarWith }) {
                         color="inherit"
                         aria-label="open drawer"
                         edge="start"
-                        onClick={handleDrawerToggle}
+                        onClick={() => setSidebarOpen(!sidebarOpen)}
                         sx={{ mr: 2, display: { sm: 'none' } }}
                     >
                         <MenuIcon />
                     </IconButton>
                     <Box sx={{ display: 'flex' }}>
-                        <img src={logo} width='40' />
-                        <Typography alignSelf='center' ml={2} variant="h6" noWrap component="div">
-                            Messenger
-                        </Typography>
+                        <Box sx={{ display: { xs: 'none', sm: 'flex'} }}>
+                            <img src={logo} width='40'  />
+                        
+                            <Typography alignSelf='center' ml={2} variant="h6" noWrap component="div">
+                                Messenger
+                            </Typography>
+                        </Box>
                     </Box>
                     
                     <Box sx={{ display: 'flex' }}>
@@ -122,8 +123,8 @@ export default function Sidebar({ sidebarWith }) {
                 {/* Below is for mobile (responsive) */}
                 <Drawer
                     variant="temporary"
-                    open={mobileOpen}
-                    onClose={handleDrawerToggle}
+                    open={sidebarOpen}
+                    onClose={() => setSidebarOpen(!sidebarOpen)}
                     ModalProps={{
                         keepMounted: true, // Better open performance on mobile.
                     }}

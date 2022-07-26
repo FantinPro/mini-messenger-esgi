@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { friendService } from '../../../../services/friend.service';
 import { UserContext } from '../../../../contexts/user.context';
 import { useForm, Controller } from 'react-hook-form';
+import { SidebarContext } from '../../../../contexts/sidebar.context';
 
 export default function FriendItemsConversation() {
     const { user } = useContext(UserContext);
@@ -20,22 +21,24 @@ export default function FriendItemsConversation() {
             const request = await friendService.addFriend(data.username);
             reset();
             switch (request.status) {
-                case 'UNKNOWN_USER':
-                    setError({ message: "Incorrect username or email !", severity: 'error' });
-                    break;
-                case 'EXISTS':
-                    setError({ message: "You are already friends with this user !", severity: 'warning' });
-                    break;
-                case 'ADDED':
-                    setError({ message: "Friend request sent successfully !", severity: 'success' });
-                    loadFriendList();
-                    break;
-                case 'PENDING':
-                    setError({ message: "You already sent a request !", severity: 'success' });
-                    break;
-                case 'ERROR_SAME_USER':
-                    setError({ message: "You can't add yourself !", severity: 'error' });
-                    break;
+            case 'UNKNOWN_USER':
+                setError({ message: "Incorrect username or email !", severity: 'error' });
+                break;
+            case 'EXISTS':
+                setError({ message: "You are already friends with this user !", severity: 'warning' });
+                break;
+            case 'ADDED':
+                setError({ message: "Friend request sent successfully !", severity: 'success' });
+                loadFriendList();
+                break;
+            case 'PENDING':
+                setError({ message: "You already sent a request !", severity: 'success' });
+                break;
+            case 'ERROR_SAME_USER':
+                setError({ message: "You can't add yourself !", severity: 'error' });
+                break;
+            default:
+                setError({ message: "An error occured !", severity: 'error' });
             }
         }
     };
@@ -127,6 +130,7 @@ export default function FriendItemsConversation() {
 
 const FriendItem = (props) => {
     const { user } = useContext(UserContext);
+    const { setSidebarOpen } = useContext(SidebarContext)
     const navigate = useNavigate()
     const friend = props.friend.sender.id === user.id ? props.friend.receiver : props.friend.sender;
     // If pendingRequest is 1, the user is the receiver else 2 if it is the sender else it is 0 when active
@@ -142,7 +146,10 @@ const FriendItem = (props) => {
     return (
         // If friendship is active
         (pendingRequest === 0 ?
-            <ListItem button onClick={() => navigate(`friends/${friend.id}`)} alignItems="flex-start">
+            <ListItem button onClick={() => {
+                setSidebarOpen(false)
+                navigate(`friends/${friend.id}`)
+            }} alignItems="flex-start">
                 <ListItemAvatar>
                     <Avatar alt={friend.username} src={friend.avatar || 'https://avatars.dicebear.com/api/male/2.svg'} />
                 </ListItemAvatar>
