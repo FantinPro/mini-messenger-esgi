@@ -12,7 +12,7 @@ export default function CounterError() {
 
     return (
         <div>
-            <button onClick={() => setCount(count + 1)}>I will throw an error when I reach 5. ({count})</button>
+            <button onClick={() => setCount(count + 1)}>reach 5. ({count})</button>
         </div>
     );
 }

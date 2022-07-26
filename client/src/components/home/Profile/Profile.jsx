@@ -84,7 +84,7 @@ export default function Profile() {
                     boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
                     borderRadius: '10px',
                     padding: '20px',
-                    width: 500
+                    width: 'fit-content'
                 }}
             >
                 <Typography sx={{

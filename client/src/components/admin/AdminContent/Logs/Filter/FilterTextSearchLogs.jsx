@@ -19,7 +19,7 @@ export default function FilterTextSearchLogs() {
     }, [searchDebounce]);
     
     return (
-        <TextField label="Search log message" variant="outlined" sx={{ width: '50%'}} onChange={
+        <TextField label="Search log message" variant="outlined" sx={{ flex: 1 , width: '50%'}} onChange={
             (event) => {
                 setSearch(event.target.value);
             }

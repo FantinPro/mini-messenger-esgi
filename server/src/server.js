@@ -18,7 +18,7 @@ const server = express();
 
 server.use(
     cors({
-        origin: config.frontBaseUrl, // only allow front call
+        origin: '*', // only allow front call
     }),
 );
 

@@ -67,11 +67,11 @@ export default class ErrorBoundary extends React.Component {
                             horizontal: this.state.snackbar.horizontal,
                         }}
                         open={this.state.snackbar.open}
-                        autoHideDuration={6000}
+                        autoHideDuration={10000}
                         onClose={this.handleClose}
                     >
                         <Alert onClose={this.handleClose} severity="error" sx={{ width: '100%' }}>
-                            Something wen wrong, our team is working on it. Please try later.
+                            Something went wrong, our team is working on it (~2 weeks because oliwier is the most useless dev in the world). Please try later.
                         </Alert>
                     </Snackbar>
                     <></>

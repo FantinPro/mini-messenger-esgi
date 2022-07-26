@@ -51,6 +51,7 @@ export default function LogsTable () {
             </TableContainer>
             <TablePagination
                 rowsPerPageOptions={[10, 30, 60]}
+                labelRowsPerPage='Logs'
                 component="div"
                 count={total}
                 rowsPerPage={filterLogs.limit}
