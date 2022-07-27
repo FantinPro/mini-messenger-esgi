@@ -1,7 +1,9 @@
 {
   "type": "module",
   "private": true,
-  "scripts": {},
+  "scripts": {
+    "start": "node ./build/server/server.js"
+  },
   "workspaces": [
     "client",
     "server"
