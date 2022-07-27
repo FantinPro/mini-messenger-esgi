@@ -74,7 +74,7 @@ export default function App() {
                         >
                             <Route path="/" element={
                                 <Box ml={1}>
-                                    <h1>Welcome {user.username} 👋</h1>
+                                    <h1>Welcome {user?.username} 👋</h1>
                                     <ul>
                                         <li>Start chating with your friends by sending invitations !</li>
                                     </ul>
