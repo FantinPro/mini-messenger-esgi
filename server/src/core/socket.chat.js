@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import * as messageService from '../services/message.service';
+import logger from '../config/logger';
 
 const messages = new Set();
 const users = new Map();
@@ -38,7 +39,7 @@ class Connection {
                 this.io.sockets.to(users.get(data.receiver.id).id).emit('message', data);
                 this.io.sockets.to(users.get(data.sender.id).id).emit('message', data);
             } catch (error) {
-                console.log(error);
+                logger.error('socket IO error', { metadata: error });
             }
         }
         await messageService.createMessage({
@@ -50,10 +51,14 @@ class Connection {
 
     async sendIsTyping(data) {
         if (users.has(data.receiver.id)) {
-            this.io.sockets.to(users.get(data.receiver.id).id).emit('isTyping', {
-                id: uuidv4(),
-                ...data,
-            });
+            try {
+                this.io.sockets.to(users.get(data.receiver.id).id).emit('isTyping', {
+                    id: uuidv4(),
+                    ...data,
+                });
+            } catch (error) {
+                logger.error('socket IO error', { metadata: error });
+            }
         }
     }
 
