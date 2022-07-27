@@ -10,7 +10,7 @@ services:
     working_dir: /home/node
     env_file: .env
     ports:
-      - $SERVER_PORT:$SERVER_PORT
+      - $PORT:$PORT
       - $CLIENT_PORT:$CLIENT_PORT
     volumes:
       - .:/home/node

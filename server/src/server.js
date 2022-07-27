@@ -4,8 +4,14 @@ import cors from 'cors';
 import express from 'express';
 import { createServer } from 'http';
 import morganBody from 'morgan-body';
-// import config from './config/config';
-// import logger from './config/logger';
+import passport from 'passport';
+import { Server } from 'socket.io';
+import config from './config/config';
+import logger from './config/logger';
+import * as passportConfig from './config/passport';
+import chat from './core/socket.chat';
+import { errorHandler } from './middlewares/error';
+import routes from './routes/index';
 
 const server = express();
 
@@ -23,7 +29,7 @@ morganBody(server, {
 
 server.use(express.json());
 
-// passportConfig.initialize(server);
+passportConfig.initialize(server);
 
 server.use(compression({
     level: 9,
@@ -31,24 +37,50 @@ server.use(compression({
 
 // If you want to make a render from the server, you can uncomments this line
 // server.use(express.static(process.env.NODE_ENV === 'development' ? '../build/client' : './build/client'));
-server.get('/hello', (req, res) => {
-    res.send('Hello world');
-});
-// server.use('/api/v1', routes);
 
-// server.use(errorHandler);
+server.use('/api/v1', routes);
+
+server.get(
+    '/api/v1/auth/google',
+    passport.authenticate('google', {
+        scope: ['email', 'profile'],
+    }),
+);
+
+// Redirect to front, (you'll need to make a request with the token inside the query param)
+// make the request to --> GET: /users/token (put the token in AUTHORIZATION header, started by bearer)
+server.get(
+    '/api/v1/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/failed' }),
+    (req, res, next) => {
+        try {
+            const { user, token } = req.user;
+            res.redirect(
+                `${config.frontBaseUrl}/auth/google/callback?user=${JSON.stringify(
+                    user,
+                )}&token=${token}`,
+            );
+        } catch (e) {
+            next(e);
+        }
+    },
+);
+
+server.use(errorHandler);
 
 const app = createServer(server);
-// const io = new Server(app, {
-//     cors: {
-//         origin: config.frontBaseUrl,
-//         methods: ['GET', 'POST'],
-//         credentials: true,
-//     },
-// });
-
-app.listen(process.env.PORT || 9000, () => {
-    console.log('api start');
+const io = new Server(app, {
+    cors: {
+        origin: config.frontBaseUrl,
+        methods: ['GET', 'POST'],
+        credentials: true,
+    },
 });
 
-// chat(io);
+app.listen(config.expressPort, () => logger.info(`server started on port ${config.expressPort} with env ${config.env}`, {
+    metadata: {
+        service: 'server',
+    },
+}));
+
+chat(io);
