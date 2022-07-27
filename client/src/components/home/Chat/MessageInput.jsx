@@ -49,6 +49,19 @@ const NewMessage = ({ socket, friend }) => {
         }
     }, [value])
 
+    useEffect(() => {
+        console.log('je tape')
+        socket.emit('isTyping', {
+            receiver: { 
+                ...friend
+            },
+            sender: {
+                ...user
+            },
+            text: value
+        });
+    }, [value])
+
     return (
         <div>
             <Paper

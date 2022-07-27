@@ -5,77 +5,90 @@ const messages = new Set();
 const users = new Map();
 
 class Connection {
-  constructor(io, socket) {
-    this.socket = socket;
-    this.io = io;
+    constructor(io, socket) {
+        this.socket = socket;
+        this.io = io;
 
-    this.login(socket.handshake.query.userId);
-    this.io.sockets.emit('users.count', users.size);
-    
-    socket.on('getMessages', () => this.getMessages());
-    socket.on('message', (value) => this.handleMessage(value));
-    socket.on('deleteUser', (userId) => this.deleteUser(userId));
-    socket.on('connect_error', (err) => {
-      console.log(`connect_error due to ${err.message}`);
-    });
-    
-    socket.on('disconnect', () => {
-      users.delete(this.socket.handshake.query.userId);
-      io.sockets.emit('users.count', users.size);
-    });
-  }
+        this.login(socket.handshake.query.userId);
+        this.io.sockets.emit('users.count', users.size);
 
-  login(userId) {
-    users.set(userId, this.socket);
-  }
+        socket.on('getMessages', () => this.getMessages());
+        socket.on('message', (value) => this.handleMessage(value));
+        socket.on('deleteUser', (userId) => this.deleteUser(userId));
+        socket.on('connect_error', (err) => {
+            console.log(`connect_error due to ${err.message}`);
+        });
+        socket.on('isTyping', (data) => {
+            console.log('OKOKOKOK');
+            this.sendIsTyping(data);
+        });
 
-  async sendMessage(data) {
-    if (users.has(data.receiver.id)) {
-      this.io.sockets.to(users.get(data.receiver.id).id).emit('message', data);
-      this.io.sockets.to(users.get(data.sender.id).id).emit('message', data);
+        socket.on('disconnect', () => {
+            users.delete(this.socket.handshake.query.userId);
+            io.sockets.emit('users.count', users.size);
+        });
     }
-    await messageService.createMessage({
-      text: data.text,
-      senderId: data.sender.id,
-      receiverId: data.receiver.id,
-    });
-  }
 
-  getMessages() {
-    messages.forEach((message) => this.sendMessage(message));
-  }
+    login(userId) {
+        users.set(userId, this.socket);
+    }
 
-  handleMessage(value) {
-    const message = {
-      id: uuidv4(),
-      text: value.text,
-      receiver: {
-        ...value.receiver
-      },
-      sender: {
-        ...value.sender
-      },
-      createdAt: Date.now()
-    };
+    async sendMessage(data) {
+        if (users.has(data.receiver.id)) {
+            this.io.sockets.to(users.get(data.receiver.id).id).emit('message', data);
+            this.io.sockets.to(users.get(data.sender.id).id).emit('message', data);
+        }
+        await messageService.createMessage({
+            text: data.text,
+            senderId: data.sender.id,
+            receiverId: data.receiver.id,
+        });
+    }
 
-    messages.add(message);
-    this.sendMessage(message);
-    messages.delete(message);
-  }
-    
-  deleteMessage(messageId) {
-    this.io.sockets.emit('deleteMessage', messageId);
-  }
+    async sendIsTyping(data) {
+        if (users.has(data.receiver.id)) {
+            this.io.sockets.to(users.get(data.receiver.id).id).emit('isTyping', {
+                id: uuidv4(),
+                ...data,
+            });
+        }
+    }
 
-  deleteUser(userId) {
-    users.delete(userId);
-  }
+    getMessages() {
+        messages.forEach((message) => this.sendMessage(message));
+    }
+
+    handleMessage(value) {
+        const message = {
+            id: uuidv4(),
+            text: value.text,
+            receiver: {
+                ...value.receiver,
+            },
+            sender: {
+                ...value.sender,
+            },
+            createdAt: Date.now(),
+        };
+
+        messages.add(message);
+        this.sendMessage(message);
+        messages.delete(message);
+    }
+
+    deleteMessage(messageId) {
+        this.io.sockets.emit('deleteMessage', messageId);
+    }
+
+    deleteUser(userId) {
+        users.delete(userId);
+    }
 }
 
 function chat(io) {
-  io.on('connection', (socket) => {
-    new Connection(io, socket);
-  });
-};
+    io.on('connection', (socket) => {
+        new Connection(io, socket);
+    });
+}
 
 export default chat;

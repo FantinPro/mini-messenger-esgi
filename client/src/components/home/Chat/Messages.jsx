@@ -3,16 +3,23 @@ import { Paper, Box, Typography, List, ListItem } from '@mui/material';
 import DOMPurify from 'dompurify';
 import { UserContext } from '../../../contexts/user.context';
 import { useParams } from 'react-router-dom';
+import useDebounce from '../../../hooks/useDebounce';
+import './messages.css'
 
-function Messages({ socket, oldMessages }) {
+function Messages({ socket, oldMessages, friend }) {
     const { user } = useContext(UserContext);
     const [messages, setMessages] = useState([]);
     let params = useParams();
     const bottomRef = useRef(null);
 
+    const [isTyping, setIsTyping] = useState(false)
+
+    const isTypingDebounced = useDebounce(isTyping, 4000)
+
     useEffect(() => {
         setMessages(oldMessages);
     }, [params, oldMessages]);
+
 
     useEffect(() => {
         const messageListener = (message) => {
@@ -24,6 +31,12 @@ function Messages({ socket, oldMessages }) {
                 });
             }
         };
+
+        const isTypingListener = (message) => {
+            bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+            setIsTyping(message.id)
+        }
+
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
 
         const deleteMessageListener = (messageID) => {
@@ -36,13 +49,22 @@ function Messages({ socket, oldMessages }) {
 
         socket.on('message', messageListener);
         socket.on('deleteMessage', deleteMessageListener);
+        socket.on('isTyping', isTypingListener);
+
         socket.emit('getMessages');
 
         return () => {
             socket.off('message', messageListener);
             socket.off('deleteMessage', deleteMessageListener);
-        };
+            socket.off('isTyping', isTypingListener);
+        }
     }, [socket, params, messages]);
+
+    useEffect(() => {
+        if (isTyping) {
+            setIsTyping(false)
+        }
+    }, [isTypingDebounced])
 
     const sanitizedData = (data) => ({
         __html: DOMPurify.sanitize(data)
@@ -86,7 +108,7 @@ function Messages({ socket, oldMessages }) {
                                 : daysBetween(message.createdAt) === -1
                                     ? ' Yesterday '
                                     : `${new Date(message.createdAt).toLocaleDateString()}`
-                                } at ${new Date(message.createdAt).toLocaleTimeString()}`}
+                            } at ${new Date(message.createdAt).toLocaleTimeString()}`}
                         </Typography>
                         <Paper
                             elevation={1}
@@ -94,10 +116,33 @@ function Messages({ socket, oldMessages }) {
                         >
                             <div dangerouslySetInnerHTML={sanitizedData(message.text)}></div>
                         </Paper>
+
                     </Box>
                 ))
             }
             <div ref={bottomRef} />
+            <Box sx={{
+                marginLeft: '1rem',
+                display: 'flex',
+                color: 'gray',
+                visibility: isTyping ? 'visible' : 'hidden',
+                alignItems: 'center',
+            }}>
+                <Box
+                    component="img"
+                    src={friend.avatar}
+                    sx={{width: 20, marginRight: 1}}>
+
+                </Box>
+                <span>{friend.username} is typing</span>
+                <Box  id="wave">
+                    <span className="dot one"></span>
+                    <span className="dot two"></span>
+                    <span className="dot three"></span>
+                </Box>
+            </Box>
+            
+            
         </Box>
     );
 }
