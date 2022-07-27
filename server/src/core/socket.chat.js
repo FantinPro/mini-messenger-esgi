@@ -19,7 +19,6 @@ class Connection {
             console.log(`connect_error due to ${err.message}`);
         });
         socket.on('isTyping', (data) => {
-            console.log('OKOKOKOK');
             this.sendIsTyping(data);
         });
 

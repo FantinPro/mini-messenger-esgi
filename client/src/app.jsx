@@ -30,12 +30,10 @@ export default function App() {
                     query: { userId: res.id }
                 });
                 setSocket(newSocket);
-                console.log('start')
             }
         }).catch(err => {
             setUser(null);
         }).finally(() => {
-            console.log('finally');
             setIsLoading(false);
         })
     }, []);

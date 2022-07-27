@@ -67,9 +67,6 @@ export const validate = async (req, res, next) => {
                 individualHooks: true,
             },
         );
-        console.log('🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩');
-        console.log(tokenRecord?.user?.email);
-        console.log('🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦');
         res.redirect(301, config.frontBaseUrl);
     } catch (err) {
         next(err);

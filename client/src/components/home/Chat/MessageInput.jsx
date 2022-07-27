@@ -50,7 +50,6 @@ const NewMessage = ({ socket, friend }) => {
     }, [value])
 
     useEffect(() => {
-        console.log('je tape')
         socket.emit('isTyping', {
             receiver: { 
                 ...friend
