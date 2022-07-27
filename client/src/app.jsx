@@ -8,6 +8,7 @@ import Register from './components/auth/Register';
 import ResetPassword from './components/auth/ResetPassword';
 import { UserContext } from './contexts/user.context';
 import { userService } from './services/user.service';
+import Box from '@mui/material/Box';
 
 const Home = React.lazy(() => import('./components/home/Home'));
 const Admin = React.lazy(() => import('./components/admin/Admin'));
@@ -71,6 +72,15 @@ export default function App() {
                                 </AuthRoute>
                             }
                         >
+                            <Route path="/" element={
+                                <Box ml={1}>
+                                    <h1>Welcome {user.username} 👋</h1>
+                                    <ul>
+                                        <li>Start chating with your friends by sending invitations !</li>
+                                    </ul>
+                                </Box>
+                            } />
+
                             <Route path="profile" element={
                                 <React.Suspense fallback={<>...</>}>
                                     <Profile />
