@@ -1,7 +1,12 @@
 import Sequelize from 'sequelize';
 
 const connection = new Sequelize(process.env.POSTGRES_DATABASE_URL, {
-    newUrlParser: true,
+    dialectOptions: {
+        ssl: {
+            require: true,
+            rejectUnauthorized: false,
+        },
+    },
 });
 
 connection.authenticate().then(() => {
