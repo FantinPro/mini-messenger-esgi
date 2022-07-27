@@ -33,8 +33,10 @@ function Messages({ socket, oldMessages, friend }) {
         };
 
         const isTypingListener = (message) => {
-            bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-            setIsTyping(message.id)
+            if (message.sender.id === params.friendId || message.sender.id === user.id) {
+                bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+                setIsTyping(message.id)
+            }
         }
 
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -57,6 +59,7 @@ function Messages({ socket, oldMessages, friend }) {
             socket.off('message', messageListener);
             socket.off('deleteMessage', deleteMessageListener);
             socket.off('isTyping', isTypingListener);
+            setIsTyping(false)
         }
     }, [socket, params, messages]);
 

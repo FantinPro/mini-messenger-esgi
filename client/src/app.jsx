@@ -1,20 +1,21 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from 'react-router-dom';
-import Admin from './components/admin/Admin';
-import Logs from './components/admin/AdminContent/Logs/Logs.jsx';
-import Reports from './components/admin/AdminContent/Reports/ReportsTable';
+import { io } from "socket.io-client";
 import AuthRoute from './components/auth/AuthRoute';
 import Login from './components/auth/Login';
 import Logout from './components/auth/Logout';
 import Register from './components/auth/Register';
-import Home from './components/home/Home';
-import Chat from './components/home/Chat/Chat';
+import ResetPassword from './components/auth/ResetPassword';
 import { UserContext } from './contexts/user.context';
 import { userService } from './services/user.service';
-import ResetPassword from './components/auth/ResetPassword';
-import Profile from './components/home/Profile/Profile';
-import Analytics from "./components/admin/AdminContent/Analytics/AnalyticsTable";
-import { io } from "socket.io-client";
+
+const Home = React.lazy(() => import('./components/home/Home'));
+const Admin = React.lazy(() => import('./components/admin/Admin'));
+const Reports = React.lazy(() => import('./components/admin/AdminContent/Reports/ReportsTable'));
+const Logs = React.lazy(() => import('./components/admin/AdminContent/Logs/Logs.jsx'));
+const Analytics = React.lazy(() => import('./components/admin/AdminContent/Analytics/AnalyticsTable'));
+const Profile = React.lazy(() => import('./components/home/Profile/Profile'))
+const Chat = React.lazy(() => import('./components/home/Chat/Chat'))
 
 export default function App() {
 
@@ -64,27 +65,49 @@ export default function App() {
                             path="/"
                             element={
                                 <AuthRoute >
-                                    <Home />
+                                    <React.Suspense fallback={<>...</>}>
+                                        <Home />
+                                    </React.Suspense>
                                 </AuthRoute>
                             }
                         >
-                            <Route path="profile" element={<Profile />} />
+                            <Route path="profile" element={
+                                <React.Suspense fallback={<>...</>}>
+                                    <Profile />
+                                </React.Suspense>
+                            } />
                             <Route path="friends/:friendId" element={
-                                <Chat />
+                                <React.Suspense fallback={<>...</>}>
+                                    <Chat />
+                                </React.Suspense>
                             } />
                         </Route>
 
                         <Route
                             element={
                                 <AuthRoute role="ROLE_ADMIN" >
-                                    <Admin />
+                                    <React.Suspense fallback={<>...</>}>
+                                        <Admin />
+                                    </React.Suspense>
                                 </AuthRoute>
                                 
                             }>
                             {/* default route is Logs */}
-                            <Route path="admin/logs" element={<Logs />} />
-                            <Route path="admin/reports" element={<Reports />} />
-                            <Route path="admin/analytics" element={<Analytics />} />
+                            <Route path="admin/logs" element={
+                                <React.Suspense fallback={<>...</>}>
+                                    <Logs />
+                                </React.Suspense>
+                            } />
+                            <Route path="admin/reports" element={
+                                <React.Suspense fallback={<>...</>}>
+                                    <Reports />
+                                </React.Suspense>
+                            } />
+                            <Route path="admin/analytics" element={
+                                <React.Suspense fallback={<>...</>}>
+                                    <Analytics />
+                                </React.Suspense>
+                            } />
                             <Route path="admin" element={<Navigate to="logs" />} />
                         </Route>
                     </Routes>
