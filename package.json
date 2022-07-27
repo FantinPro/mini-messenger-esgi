@@ -2,7 +2,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "npm install && npm --workspace server run production && node ./build/server/server.js"
+    "start": "node ./build/server/server.js"
   },
   "workspaces": [
     "client",

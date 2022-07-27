@@ -1,0 +1,1 @@
+import o from"body-parser";import r from"compression";import e from"cors";import s from"express";import{createServer as m}from"http";import t from"morgan-body";const p=s();p.use(e({origin:"*"})),p.use(o.json()),t(p,{logResponseBody:!0}),p.use(s.json()),p.use(r({level:9})),p.get("/hello",((o,r)=>{r.send("Hello world")}));m(p).listen(9e3,(()=>{console.log("api start")}));
