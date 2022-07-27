@@ -21,7 +21,7 @@ class Connection {
     
     socket.on('disconnect', () => {
       users.delete(this.socket.handshake.query.userId);
-      io.sockets.emit('users.count', users.size);
+      this.io.sockets.emit('users.count', users.size);
     });
   }
 

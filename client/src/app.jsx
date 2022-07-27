@@ -21,6 +21,7 @@ export default function App() {
     const [user, setUser] = useState(null);
     const [socket, setSocket] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [nbUsersConnected, setNbUsersConnected] = useState(0);
 
     useEffect(() => {
         userService.getUserByToken().then(res => {        
@@ -30,12 +31,10 @@ export default function App() {
                     query: { userId: res.id }
                 });
                 setSocket(newSocket);
-                console.log('start')
             }
         }).catch(err => {
             setUser(null);
         }).finally(() => {
-            console.log('finally');
             setIsLoading(false);
         })
     }, []);
@@ -47,7 +46,9 @@ export default function App() {
                     user,
                     setUser,
                     socket,
-                    setSocket
+                    setSocket,
+                    nbUsersConnected,
+                    setNbUsersConnected
                 }} >
                     
                     <Routes>

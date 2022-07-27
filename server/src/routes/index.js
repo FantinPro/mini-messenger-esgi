@@ -5,6 +5,7 @@ import messageRoutes from './message.routes';
 import friendRoutes from './friend.routes';
 import interestRoutes from './interest.routes';
 import logRoutes from './log.routes';
+import analyticRoutes from './analytic.routes';
 
 const router = express.Router();
 
@@ -32,6 +33,10 @@ const routes = [
     {
         path: 'logs',
         routes: logRoutes,
+    },
+    {
+        path: 'analytics',
+        routes: analyticRoutes,
     },
 ];
 

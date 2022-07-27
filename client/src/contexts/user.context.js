@@ -5,4 +5,6 @@ export const UserContext = createContext({
     setUser: () => {},
     socket: null,
     setSocket: () => {},
+    nbUsersConnected: 0,
+    setNbUsersConnected: () => {},
 });
