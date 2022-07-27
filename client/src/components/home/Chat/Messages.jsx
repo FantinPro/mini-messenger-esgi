@@ -20,10 +20,10 @@ function Messages({ socket, oldMessages, friend }) {
         setMessages(oldMessages);
     }, [params, oldMessages]);
 
-
     useEffect(() => {
         const messageListener = (message) => {
             if (message.sender.id === params.friendId || message.sender.id === user.id) {
+                setIsTyping(false)
                 setMessages((prevMessages) => {
                     const newMessages = { ...prevMessages };
                     newMessages[message.id] = message;
@@ -34,8 +34,12 @@ function Messages({ socket, oldMessages, friend }) {
 
         const isTypingListener = (message) => {
             if (message.sender.id === params.friendId || message.sender.id === user.id) {
-                bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-                setIsTyping(message.id)
+                if ( message.text !== '') {
+                    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+                    setIsTyping(message.id)
+                } else {
+                    setIsTyping(false)
+                }
             }
         }
 
