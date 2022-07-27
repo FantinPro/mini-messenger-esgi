@@ -597,8 +597,12 @@ class Connection {
 
     async sendMessage(data) {
         if (users.has(data.receiver.id)) {
-            this.io.sockets.to(users.get(data.receiver.id).id).emit('message', data);
-            this.io.sockets.to(users.get(data.sender.id).id).emit('message', data);
+            try {
+                this.io.sockets.to(users.get(data.receiver.id).id).emit('message', data);
+                this.io.sockets.to(users.get(data.sender.id).id).emit('message', data);
+            } catch (error) {
+                console.log(error);
+            }
         }
         await createMessage({
             text: data.text,
