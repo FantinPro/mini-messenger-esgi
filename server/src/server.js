@@ -47,7 +47,7 @@ const app = createServer(server);
 //     },
 // });
 
-app.listen(9000, () => {
+app.listen(process.env.PORT || 9000, () => {
     console.log('api start');
 });
 
