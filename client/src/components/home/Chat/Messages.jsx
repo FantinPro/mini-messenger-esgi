@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useContext, useRef } from 'react';
-import { Paper, Box, Typography, List, ListItem } from '@mui/material';
-import DOMPurify from 'dompurify';
-import { UserContext } from '../../../contexts/user.context';
+import { Box } from '@mui/material';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { UserContext } from '../../../contexts/user.context';
+import Message from './Message';
 
 function Messages({ socket, oldMessages }) {
     const { user } = useContext(UserContext);
@@ -11,90 +11,61 @@ function Messages({ socket, oldMessages }) {
     const bottomRef = useRef(null);
 
     useEffect(() => {
+        console.log('messages', messages);
+    }, [messages]);
+
+    useEffect(() => {
         setMessages(oldMessages);
     }, [params, oldMessages]);
 
     useEffect(() => {
         const messageListener = (message) => {
-            if (message.sender.id === params.friendId || message.sender.id === user.id) {
+            console.log('new message', message)
+            if (message.senderId === params.friendId || message.senderId === user.id) {
                 setMessages((prevMessages) => {
-                    const newMessages = { ...prevMessages };
-                    newMessages[message.id] = message;
+                    const newMessages = [ ...prevMessages ];
+                    newMessages.push(message);
                     return newMessages;
                 });
             }
         };
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
 
-        const deleteMessageListener = (messageID) => {
+        const onMessageUpdate = (message) => {
+            console.log('message update', message)
+
             setMessages((prevMessages) => {
-                const newMessages = { ...prevMessages };
-                delete newMessages[messageID];
+                const newMessages = [...prevMessages];
+                const index = prevMessages.findIndex((m) => m.id === message.id);
+                newMessages[index] = message;
                 return newMessages;
             });
         };
 
+
         socket.on('message', messageListener);
-        socket.on('deleteMessage', deleteMessageListener);
+        socket.on('delete', onMessageUpdate);
+        socket.on('update', onMessageUpdate);
         socket.emit('getMessages');
 
         return () => {
             socket.off('message', messageListener);
-            socket.off('deleteMessage', deleteMessageListener);
+            socket.off('delete', onMessageUpdate);
+            socket.off('update', onMessageUpdate);
         };
     }, [socket, params, messages]);
 
-    const sanitizedData = (data) => ({
-        __html: DOMPurify.sanitize(data)
-    })
+    
 
-    const daysBetween = (messageDate) => {
-        const today = new Date();
-        const message = new Date(messageDate);
-        const one = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        const two = new Date(message.getFullYear(), message.getMonth(), message.getDate());
-        const millisecondsPerDay = 1000 * 60 * 60 * 24;
-        const millisBetween = two.getTime() - one.getTime();
-        const days = millisBetween / millisecondsPerDay;
-        return Math.floor(days);
-    }
+
+    
 
     return (
         <Box sx={{ flex: '1 0 0', overflowY: 'auto' }}>
             {[...Object.values(messages)]
-                .sort((a, b) => a.createdAt - b.createdAt)
+                .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
                 .map((message) => (
-                    <Box sx={{ display: 'box', marginY: '15px', marginX: '15px' }} key={message.id}>
-                        <Typography
-                            sx={{ display: 'inline' }}
-                            component="span"
-                            variant="subtitle2"
-                            color="text.primary"
-                        >
-                            {message.sender
-                                ? message.sender.id === user.id ? 'Moi' : message.sender.username
-                                : message.receiver.username}
-                        </Typography>
-                        <Typography
-                            sx={{ display: 'inline' }}
-                            component="span"
-                            variant="subtitle2"
-                            color="text.secondary"
-                        >
-                            {`${daysBetween(message.createdAt) === 0
-                                ? ' Today'
-                                : daysBetween(message.createdAt) === -1
-                                    ? ' Yesterday '
-                                    : `${new Date(message.createdAt).toLocaleDateString()}`
-                                } at ${new Date(message.createdAt).toLocaleTimeString()}`}
-                        </Typography>
-                        <Paper
-                            elevation={1}
-                            sx={{ width: "fit-content", padding: '8px', marginTop: '3px' }}
-                        >
-                            <div dangerouslySetInnerHTML={sanitizedData(message.text)}></div>
-                        </Paper>
-                    </Box>
+                    <Message key={message.id} message={message} socket={socket}/>
                 ))
             }
             <div ref={bottomRef} />

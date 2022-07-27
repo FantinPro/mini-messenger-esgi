@@ -28,7 +28,16 @@ export const updateMessage = async (req, res, next) => {
     try {
         const { messageId } = req.params;
         const { body } = req;
-        const message = await messageService.updateMessage(messageId, body);
+        if (!body.text) {
+            res.status(422).json({
+                error: 'text is required',
+            });
+        }
+        const content = {
+            text: body.text,
+            updated_at: new Date(),
+        };
+        const message = await messageService.updateMessage(messageId, content);
         res.json(message);
     } catch (e) {
         next(e);

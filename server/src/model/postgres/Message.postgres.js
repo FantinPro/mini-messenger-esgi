@@ -1,4 +1,4 @@
-import { Model, DataTypes } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import { connection } from '../../core/db/postgres/db.postgres';
 
 class Message extends Model {}
@@ -13,6 +13,10 @@ Message.init(
         text: {
             type: DataTypes.STRING,
             allowNull: false,
+        },
+        edited_at: {
+            type: DataTypes.DATE,
+            allowNull: true,
         },
         edited: {
             type: DataTypes.BOOLEAN,
