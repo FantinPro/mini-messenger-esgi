@@ -1,1 +1,1 @@
-web: npm i && npm --workspace server run production && node ./build/server/server.js
+web: npm start
