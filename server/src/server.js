@@ -36,6 +36,9 @@ server.use(compression({
 
 // If you want to make a render from the server, you can uncomments this line
 // server.use(express.static(process.env.NODE_ENV === 'development' ? '../build/client' : './build/client'));
+server.get('/ping', (req, res) => {
+    res.send('pong');
+});
 
 server.use('/api/v1', routes);
 
