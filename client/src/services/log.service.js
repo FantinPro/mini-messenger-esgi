@@ -1,7 +1,7 @@
 import { httpMethodsWrapper } from '../helpers/http-methods-wrapper';
 import config from '../config/config';
 
-const baseUrl = `${config.apiUrl}/logs`;
+const baseUrl = `${config.apiUrl}/api/v1/logs`;
 
 export const logService = {
     sendLogError,

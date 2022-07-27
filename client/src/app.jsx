@@ -17,6 +17,7 @@ const Logs = React.lazy(() => import('./components/admin/AdminContent/Logs/Logs.
 const Analytics = React.lazy(() => import('./components/admin/AdminContent/Analytics/AnalyticsTable'));
 const Profile = React.lazy(() => import('./components/home/Profile/Profile'))
 const Chat = React.lazy(() => import('./components/home/Chat/Chat'))
+import config from './config/config';
 
 export default function App() {
 
@@ -28,7 +29,7 @@ export default function App() {
         userService.getUserByToken().then(res => {        
             if (res) {
                 setUser(res);
-                const newSocket = io(`http://${window.location.hostname}:9000`, {
+                const newSocket = io(config.apiUrl, {
                     query: { userId: res.id }
                 });
                 setSocket(newSocket);
