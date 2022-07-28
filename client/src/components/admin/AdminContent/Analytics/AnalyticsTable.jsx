@@ -9,13 +9,9 @@ import Row from './Row';
 
 export default function Analytics() {
 
-    const { socket, nbUsersConnected, setNbUsersConnected } = useContext(UserContext);
+    const { nbUsersConnected } = useContext(UserContext);
     const [stats, setStats] = useState({})
     const [analytics, setAnalytics] = useState([])
-
-    socket.on('users.count', function (number) {
-        setNbUsersConnected(number);
-    });
 
     useEffect(() => {
         const getStats = async () => {

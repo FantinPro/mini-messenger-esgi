@@ -45,6 +45,10 @@ export default function App() {
 
     socket && socket.on('connect', () => {
 
+        socket.on('usersCount', function (number) {
+            setNbUsersConnected(number);
+        });
+
         const session_id = localStorage.getItem('session_id');
 
         if (!session_id) {

@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
 import * as messageService from '../services/message.service';
-import logger from '../config/logger';
 
 const messages = new Set();
 
@@ -11,9 +10,7 @@ class Connection {
         this.socket.join(this.user);
         this.io = io;
 
-        console.log('users.count', this.io.sockets.sockets.size);
-
-        this.io.emit('users.count', this.io.sockets.sockets.size);
+        this.io.sockets.emit('usersCount', this.io.sockets.sockets.size);
 
         socket.on('getMessages', () => this.getMessages());
         socket.on('message', (value) => this.handleMessage(value));
@@ -96,8 +93,8 @@ class Connection {
     disconnect() {
         this.socket.leave(this.user);
         this.user = null;
-        this.io.emit('users.count', this.io.sockets.sockets.size);
         this.socket.disconnect();
+        this.socket.broadcast.emit('usersCount', this.io.sockets.sockets.size);
     }
 }
 
