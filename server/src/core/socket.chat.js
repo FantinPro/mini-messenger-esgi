@@ -11,7 +11,9 @@ class Connection {
         this.socket.join(this.user);
         this.io = io;
 
-        this.io.sockets.emit('users.count', this.io.engine.clientsCount);
+        console.log('users.count', this.io.sockets.sockets.size);
+
+        this.io.emit('users.count', this.io.sockets.sockets.size);
 
         socket.on('getMessages', () => this.getMessages());
         socket.on('message', (value) => this.handleMessage(value));
@@ -24,11 +26,6 @@ class Connection {
         socket.on('connect_error', (err) => {
             console.log(`connect_error due to ${err.message}`);
         });
-    }
-
-    login(userId) {
-        this.socket.join(userId);
-        this.user = userId;
     }
 
     async sendMessage(data) {
@@ -99,7 +96,7 @@ class Connection {
     disconnect() {
         this.socket.leave(this.user);
         this.user = null;
-        this.io.sockets.emit('users.count', this.io.engine.clientsCount);
+        this.io.emit('users.count', this.io.sockets.sockets.size);
         this.socket.disconnect();
     }
 }
