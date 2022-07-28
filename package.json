@@ -7,5 +7,9 @@
   "workspaces": [
     "client",
     "server"
-  ]
+  ],
+  "dependencies": {
+    "date-fns": "^2.29.1",
+    "react-device-detect": "^2.2.2"
+  }
 }

@@ -14,7 +14,14 @@ function a11yProps(index) {
 }
 
 export default function NavTabs() {
-    const [navigationIndex, setNavigationIndex] = useState(0);
+    let defaultIndex = 0;
+    if (window.location.pathname) {
+        if (window.location.pathname === "/admin/reports") defaultIndex = 1
+        else if (window.location.pathname === "/admin/analytics") defaultIndex = 2
+    }
+
+    const [navigationIndex, setNavigationIndex] = useState(defaultIndex);
+
     const navigate = useNavigate()
 
     const handleNav = useCallback((event, newNavigationIndex) => {

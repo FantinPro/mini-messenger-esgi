@@ -8,8 +8,6 @@ export default function SidebarContent ({ navigationIndex }) {
         switch (navigationIndex) {
         case 0:
             return <FriendItemsConversation />;
-        case 1:
-            return <div>Notifications</div>;
         default:
             return <></>;
         }

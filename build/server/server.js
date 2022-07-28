@@ -597,6 +597,10 @@ class Connection {
         this.socket.join(this.user);
         this.io = io;
 
+        console.log('users.count', this.io.sockets.sockets.size);
+
+        this.io.emit('users.count', this.io.sockets.sockets.size);
+
         socket.on('getMessages', () => this.getMessages());
         socket.on('message', (value) => this.handleMessage(value));
         socket.on('update', (message) => this.editMessage(message));
@@ -610,11 +614,6 @@ class Connection {
         });
     }
 
-    login(userId) {
-        this.socket.join(userId);
-        this.user = userId;
-    }
-
     async sendMessage(data) {
         const message = await createMessage({
             text: data.text,
@@ -622,10 +621,6 @@ class Connection {
             receiverId: data.receiver.id,
         });
 
-        console.log('🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩');
-        console.log(message);
-        console.log(this.user);
-        console.log('🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦');
         if (this.user) {
             this.io.sockets.to([data.receiver.id, data.sender.id]).emit('message', message);
         }
@@ -687,6 +682,7 @@ class Connection {
     disconnect() {
         this.socket.leave(this.user);
         this.user = null;
+        this.io.emit('users.count', this.io.sockets.sockets.size);
         this.socket.disconnect();
     }
 }
@@ -871,12 +867,12 @@ const resetPassword$1 = async (req, res, next) => {
     }
 };
 
-const router$6 = express.Router();
+const router$7 = express.Router();
 
-router$6.post('/register', register);
-router$6.post('/login', login);
-router$6.get('/validate', validate);
-router$6.post('/reset-password', resetPassword$1);
+router$7.post('/register', register);
+router$7.post('/login', login);
+router$7.get('/validate', validate);
+router$7.post('/reset-password', resetPassword$1);
 
 /* eslint-disable no-param-reassign */
 
@@ -1032,12 +1028,12 @@ function authorized(role = roles.ROLE_USER) {
         });
 }
 
-const router$5 = express.Router();
+const router$6 = express.Router();
 
-router$5.post('/reset-password', resetPassword);
-router$5.get('/token', authorized(), getUserByToken);
-router$5.put('/profile', authorized(), updateProfile);
-router$5.put('/password', authorized(), updatePassword);
+router$6.post('/reset-password', resetPassword);
+router$6.get('/token', authorized(), getUserByToken);
+router$6.put('/profile', authorized(), updateProfile);
+router$6.put('/password', authorized(), updatePassword);
 
 const sendMessage = async (req, res, next) => {
     try {
@@ -1120,13 +1116,13 @@ const isMyMessage = async (req, res, next) => {
     next();
 };
 
-const router$4 = express.Router();
+const router$5 = express.Router();
 
-router$4.post('/', authorized(), areFriends, sendMessage);
+router$5.post('/', authorized(), areFriends, sendMessage);
 
 // used for DELETE or UPDATE a message cf : cahier des charges
-router$4.put('/:messageId', authorized(), isMyMessage, updateMessage);
-router$4.get('/:senderId/:receiverId', authorized(), getMessagesFromUsers);
+router$5.put('/:messageId', authorized(), isMyMessage, updateMessage);
+router$5.get('/:senderId/:receiverId', authorized(), getMessagesFromUsers);
 
 const getFriendsList$1 = async (userId, status = [friendsStatus.ACTIVE, friendsStatus.PENDING]) => Friend.findAll({
     where: {
@@ -1338,13 +1334,13 @@ const getFriendChat = async (req, res, next) => {
     }
 };
 
-const router$3 = express.Router();
+const router$4 = express.Router();
 
-router$3.get('/:userId', authorized(), getFriendsList);
-router$3.post('/add', authorized(), sendFriendInvitation);
-router$3.put('/:friendId', authorized(), acceptFriendInvitation);
-router$3.delete('/:friendId', authorized(), deleteFriend);
-router$3.get('/:friendId/chat', authorized(), getFriendChat);
+router$4.get('/:userId', authorized(), getFriendsList);
+router$4.post('/add', authorized(), sendFriendInvitation);
+router$4.put('/:friendId', authorized(), acceptFriendInvitation);
+router$4.delete('/:friendId', authorized(), deleteFriend);
+router$4.get('/:friendId/chat', authorized(), getFriendChat);
 
 const getAll = async (req, res, next) => {
     try {
@@ -1355,9 +1351,9 @@ const getAll = async (req, res, next) => {
     }
 };
 
-const router$2 = express.Router();
+const router$3 = express.Router();
 
-router$2.get('/', getAll);
+router$3.get('/', getAll);
 
 //
 const logSchema = new mongoose.Schema(
@@ -1447,36 +1443,166 @@ const search = async (req, res, next) => {
     }
 };
 
+const router$2 = express.Router();
+
+router$2.post('/', authorized(), create);
+router$2.post('/search', authorized('ROLE_ADMIN'), search);
+
+const getUsersActive = () => User.count({
+    where: {
+        active: true,
+    },
+});
+
+const analyticSchema = new mongoose.Schema(
+    {
+        userId: {
+            type: String,
+            required: true,
+        },
+        sessions: {
+            type: [
+                {
+                    sessionId: {
+                        type: String,
+                        required: true,
+                    },
+                    device: {
+                        type: String,
+                        required: true,
+                    },
+                    browser: {
+                        type: String,
+                        required: true,
+                    },
+                    os: {
+                        type: String,
+                        required: true,
+                    },
+                    country: {
+                        type: String,
+                        required: true,
+                    },
+                    duration: {
+                        type: Number,
+                    },
+                    timestamp: {
+                        type: Date,
+                        default: Date.now,
+                    },
+                },
+            ],
+            required: true,
+        },
+    },
+    {
+        timestamps: true,
+    },
+);
+
+const Analytic = mongoose.model('Analytic', analyticSchema);
+
+const addNewSession = async (req, res, next) => {
+    try {
+        const { userId, config } = req.body;
+
+        const analytic = await Analytic.findOne({ userId });
+
+        if (!analytic) {
+            const newAnalytic = await Analytic.create({
+                userId,
+                sessions: [{ ...config }],
+            });
+
+            res.json({ id: newAnalytic.id });
+        } else {
+            analytic.sessions.push(config);
+            await analytic.save();
+            res.json({ id: analytic.id });
+        }
+    } catch (e) {
+        next(e);
+    }
+};
+
+const updateSession = async (req, res, next) => {
+    try {
+        const { userId, sessionId, duration } = req.body;
+
+        const analytic = await Analytic.updateOne(
+            { userId, 'sessions.sessionId': sessionId },
+            { $set: { 'sessions.$.duration': duration } },
+        );
+
+        res.json({ id: analytic.id });
+    } catch (e) {
+        next(e);
+    }
+};
+
+const getSessions = async (req, res, next) => {
+    try {
+        const analytic = await Analytic.find();
+
+        res.json(analytic);
+    } catch (e) {
+        next(e);
+    }
+};
+
+const stats = async (req, res, next) => {
+    try {
+        const statsArr = [];
+
+        const countUsersActive = await getUsersActive();
+        statsArr.push({
+            count: countUsersActive,
+            text: "Nombres d'utilisateurs confirmés",
+            iconName: 'VerifiedUser',
+        });
+
+        res.json(statsArr || []);
+    } catch (err) {
+        next(err);
+    }
+};
+
 const router$1 = express.Router();
 
-router$1.post('/', authorized(), create);
-router$1.post('/search', authorized('ROLE_ADMIN'), search);
+router$1.get('/stats', authorized('ROLE_ADMIN'), stats);
+router$1.post('/addNewSession', authorized(), addNewSession);
+router$1.post('/updateSession', authorized(), updateSession);
+router$1.post('/getSessions', authorized(), getSessions);
 
 const router = express.Router();
 
 const routes = [
     {
         path: 'auth',
-        routes: router$6,
+        routes: router$7,
     },
     {
         path: 'users',
-        routes: router$5,
+        routes: router$6,
     },
     {
         path: 'messages',
-        routes: router$4,
+        routes: router$5,
     },
     {
         path: 'friends',
-        routes: router$3,
+        routes: router$4,
     },
     {
         path: 'interests',
-        routes: router$2,
+        routes: router$3,
     },
     {
         path: 'logs',
+        routes: router$2,
+    },
+    {
+        path: 'analytics',
         routes: router$1,
     },
 ];

@@ -1,4 +1,3 @@
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import PeopleIcon from '@mui/icons-material/People';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
@@ -16,7 +15,6 @@ export default function BottomNavigationSidebar({ navigationIndex, setNavigation
                 }}
             >
                 <BottomNavigationAction label="Friends" icon={<PeopleIcon />} />
-                <BottomNavigationAction label="Notifications" icon={<NotificationsIcon />} />
             </BottomNavigation>
         </Box>
     );
