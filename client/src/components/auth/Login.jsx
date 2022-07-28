@@ -9,6 +9,7 @@ import { UserContext } from '../../contexts/user.context';
 import { authService } from '../../services/auth.service';
 import logo from '../../../assets/images/messenger.png';
 import { io } from 'socket.io-client';
+import config from '../../config/config';
 
 const style = {
     position: 'absolute',
@@ -69,7 +70,7 @@ export default function Login() {
                 .then((res) => {
                     setUser(res.user);
                     localStorage.removeItem('session_id');
-                    const newSocket = io(`http://${window.location.hostname}:9000`, {
+                    const newSocket = io(config.apiUrl, {
                         query: { userId: res.user.id }
                     });
                     setSocket(newSocket);

@@ -1,7 +1,26 @@
 import { Op } from 'sequelize';
 import { Message, User } from '../model/postgres/index';
 
-export const createMessage = (message) => Message.create(message);
+export const createMessage = async (message) => {
+    const m = await Message.create(message);
+    const s = await Message.findOne({
+        where: { id: m.dataValues.id },
+        include: [
+            {
+                model: User,
+                as: 'sender',
+                attributes: ['id', 'username', 'email'],
+            },
+            {
+                model: User,
+                as: 'receiver',
+                attributes: ['id', 'username', 'email'],
+
+            },
+        ],
+    });
+    return s;
+};
 
 export const getMessagesFromUsers = (senderId, receiverId) => Message.findAll({
     where: {
@@ -31,9 +50,14 @@ export const getMessagesFromUsers = (senderId, receiverId) => Message.findAll({
     order: [['createdAt', 'ASC']],
 });
 
-export const updateMessage = (messageId, message) => Message.update(message, {
+export const updateMessage = (message) => Message.update(message, {
+    where: {
+        id: message.id,
+    },
+});
+
+export const deleteMessage = (messageId, message) => Message.update(message, {
     where: {
         id: messageId,
     },
-    returning: true,
 });

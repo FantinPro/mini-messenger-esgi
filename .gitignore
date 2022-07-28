@@ -11,4 +11,3 @@ ds_store
 db-data-*
 prisma
 .node*
-build

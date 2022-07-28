@@ -15,7 +15,7 @@ export default {
         password: process.env.MONGODB_PASSWORD,
         uri: process.env.MONGODB_URI,
     },
-    expressPort: process.env.SERVER_PORT || 9000,
+    expressPort: process.env.PORT || 9000,
     env: process.env.NODE_ENV || 'development',
     mailerKey: process.env.MAILER_KEY,
 };

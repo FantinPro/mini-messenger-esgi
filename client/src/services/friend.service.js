@@ -1,7 +1,7 @@
 import { httpMethodsWrapper } from '../helpers/http-methods-wrapper';
 import config from '../config/config';
 
-const baseUrl = `${config.apiUrl}/friends`;
+const baseUrl = `${config.apiUrl}/api/v1/friends`;
 
 export const friendService = {
   getFriendsList,

@@ -25,26 +25,6 @@ const jwtVerify = async (payload, done) => {
     }
 };
 
-const googleVerify = async (accessToken, refreshToken, profile, cb) => {
-    try {
-        const { id, emails } = profile;
-        let user = await User.findOne({ where: { googleId: profile.id } });
-        if (!user) {
-            user = await usersService.createUser({
-                googleId: id,
-                email: emails[0].value,
-            });
-            // dont't need to do this but if we want to store display name in the future, we will update it.
-            User.update({ googleId: id }, { where: { id: user.id }, returning: true });
-        }
-        const token = await tokensService.getAccessTokens(user);
-
-        cb(null, { user, token });
-    } catch (error) {
-        cb(error, false);
-    }
-};
-
 export const initialize = function (app) {
     // init default passport behavior
     app.use(passport.initialize());
@@ -65,11 +45,4 @@ export const initialize = function (app) {
     passport.use(
         new Strategy(opts, jwtVerify),
     );
-
-    // google strategy
-    passport.use(new GoogleStrategy.Strategy({
-        clientID: config.google.clientId,
-        clientSecret: config.google.clientSecret,
-        callbackURL: config.google.callbackUrl,
-    }, googleVerify));
 };
