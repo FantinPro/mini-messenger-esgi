@@ -1,4 +1,3 @@
-import { Op } from 'sequelize';
 import { User } from '../model/postgres/index';
 
 export const getUsersActive = () => User.count({

@@ -68,6 +68,7 @@ export default function Login() {
                 .login(email, password)
                 .then((res) => {
                     setUser(res.user);
+                    localStorage.removeItem('session_id');
                     const newSocket = io(`http://${window.location.hostname}:9000`, {
                         query: { userId: res.user.id }
                     });

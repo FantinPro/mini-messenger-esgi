@@ -2,13 +2,16 @@ import React, { useContext, useState, useEffect } from 'react';
 import * as Icons from '@mui/icons-material'
 import { Box } from '@mui/material';
 import { blue } from '@mui/material/colors';
+import { TableContainer, TableHead, Table, TableRow, TableCell, TableBody, TablePagination, Paper } from '@mui/material';
 import { UserContext } from '../../../../contexts/user.context';
 import { analyticService } from '../../../../services/analytic.service';
+import Row from './Row';
 
 export default function Analytics() {
 
     const { socket, nbUsersConnected, setNbUsersConnected } = useContext(UserContext);
     const [stats, setStats] = useState({})
+    const [analytics, setAnalytics] = useState([])
 
     socket.on('users.count', function (number) {
         setNbUsersConnected(number);
@@ -18,6 +21,10 @@ export default function Analytics() {
         const getStats = async () => {
             await analyticService.stats().then(res => {
                 setStats(res);
+            })
+
+            await analyticService.getSessions().then(res => {
+                setAnalytics(res);            
             })
         }
 
@@ -41,6 +48,22 @@ export default function Analytics() {
                     />
                 ))}
             </Box>
+            <TableContainer sx={{ flex: '1 0 0', marginTop: 4 }} component={Paper}>
+                <Table stickyHeader aria-label="sticky table">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>User</TableCell>
+                            <TableCell align="left">Last Connection</TableCell>
+                            <TableCell align="center">Connections</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {analytics.length > 0 && analytics.map(analytic => (
+                            <Row key={analytic._id} analytic={analytic} />
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </Box>
     );
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Admin from './components/admin/Admin';
 import Logs from './components/admin/AdminContent/Logs/Logs.jsx';
@@ -15,6 +15,8 @@ import ResetPassword from './components/auth/ResetPassword';
 import Profile from './components/home/Profile/Profile';
 import Analytics from "./components/admin/AdminContent/Analytics/AnalyticsTable";
 import { io } from "socket.io-client";
+import { browserName } from 'react-device-detect';
+import { analyticService } from './services/analytic.service';
 
 export default function App() {
 
@@ -32,13 +34,39 @@ export default function App() {
                 });
                 setSocket(newSocket);
             }
-        }).catch(err => {
+        }).catch(_ => {
             setUser(null);
         }).finally(() => {
             setIsLoading(false);
         })
     }, []);
 
+    socket && socket.on('connect', () => {
+
+        const session_id = localStorage.getItem('session_id');
+
+        if (!session_id) {
+            let id = `id-${Math.random().toString(16).slice(2)}`;
+            localStorage.setItem('session_id', id);
+            const newSession = {
+                sessionId: id,
+                device: navigator.userAgentData.mobile ? 'Mobile' : 'Desktop',
+                os: navigator.userAgentData.platform,
+                browser: browserName,
+                country: navigator.language.split('-')[0], 
+            };
+            analyticService.addNewSession({ userId: user.id, config: newSession });
+            localStorage.setItem('sessionStart', new Date().getTime());
+        }
+
+        socket.on('disconnect', () => {
+            const sessionEnd = new Date().getTime();
+            const sessionStart = localStorage.getItem('sessionStart');
+            const sessionDuration = sessionEnd - sessionStart;
+            analyticService.updateSession({ userId: user.id, sessionId: session_id, duration: sessionDuration });
+        })
+    })
+    
     return (
         <>
             {!isLoading &&
