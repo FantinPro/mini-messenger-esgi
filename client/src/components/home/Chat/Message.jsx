@@ -13,11 +13,11 @@ export default function Message({ message, socket }) {
     })
 
     function handleMessageClick(e, message) {
-
         if (message.sender.id === user.id) {
             setEditInput(message.text);
             setIsClicked(true);
         }
+        
     }
   
     const daysBetween = (messageDate) => {
@@ -54,11 +54,13 @@ export default function Message({ message, socket }) {
         return () => {
             // Unbind the event listener on clean up
             document.removeEventListener("mousedown", handleClickOutside);
+            setIsClicked(false);
         };
     }, [componentRef]);
 
-    function handleEdit() {
-        console.log('here')
+    function handleEdit(e) {
+        e.stopPropagation();
+        setIsClicked(false);
         const editedMessage = { ...message };
         editedMessage.text = editInput;
         socket.emit('update', editedMessage);
@@ -67,6 +69,10 @@ export default function Message({ message, socket }) {
     function handleDelete() {
         socket.emit('delete', message)
     }
+
+    useEffect(() => {console.log(isClicked)}, [isClicked])
+
+    const input = useRef(null);
 
     if (message.deleted === true) {
         return (<Box sx={{ display: 'box', marginY: '15px', marginX: '15px' }}>
@@ -94,7 +100,6 @@ export default function Message({ message, socket }) {
                 } at ${new Date(message.createdAt).toLocaleTimeString()}`}
             </Typography>
             <Paper  
-                onClick={(e) => handleMessageClick(e, message)}
                 elevation={1}
                 sx={{ width: "fit-content", padding: '8px', marginTop: '3px' }}
             >
@@ -144,7 +149,7 @@ export default function Message({ message, socket }) {
                 elevation={1}
                 sx={{ width: "fit-content", padding: '8px', marginTop: '3px' }}
             >
-                {isClicked ? <Box sx={{display: "flex", alignItems: 'end'}}><TextField value={editInput} onChange={(e) => setEditInput(e.target.value)} id="outlined-basic" label="Edit" variant="standard" /><IconButton onClick={handleEdit}><Save color='success'/></IconButton><IconButton onClick={handleDelete}><Delete color='error'/></IconButton></Box> : <div dangerouslySetInnerHTML={sanitizedData(message.text)}/>}             
+                {isClicked ? <Box sx={{display: "flex", alignItems: 'end'}}><TextField ref={input} value={editInput} onChange={(e) => setEditInput(e.target.value)} id="outlined-basic" label="Edit" variant="standard" /><IconButton onClick={handleEdit}><Save color='success'/></IconButton><IconButton onClick={handleDelete}><Delete color='error'/></IconButton></Box> : <div dangerouslySetInnerHTML={sanitizedData(message.text)}/>}             
             </Paper>                 
         </Box>
     )

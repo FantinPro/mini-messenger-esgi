@@ -33,9 +33,6 @@ function Messages({ socket, oldMessages, friend }) {
         };
 
         const isTypingListener = (message) => {
-            console.log('🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩')
-            console.log(message)
-            console.log('🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦')
             if (message.sender.id !== user.id) {
                 if ( message.text !== '') {
                     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
