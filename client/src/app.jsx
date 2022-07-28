@@ -17,7 +17,6 @@ const Analytics = React.lazy(() => import('./components/admin/AdminContent/Analy
 const Profile = React.lazy(() => import('./components/home/Profile/Profile'))
 const Chat = React.lazy(() => import('./components/home/Chat/Chat'))
 import config from './config/config';
-import { browserName } from 'react-device-detect';
 import { analyticService } from './services/analytic.service';
 
 export default function App() {
@@ -58,7 +57,7 @@ export default function App() {
                 sessionId: id,
                 device: navigator.userAgentData.mobile ? 'Mobile' : 'Desktop',
                 os: navigator.userAgentData.platform,
-                browser: browserName,
+                browser: 'Chrome',
                 country: navigator.language.split('-')[0], 
             };
             analyticService.addNewSession({ userId: user.id, config: newSession });
