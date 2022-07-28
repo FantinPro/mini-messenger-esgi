@@ -11,6 +11,8 @@ class Connection {
         this.socket.join(this.user);
         this.io = io;
 
+        this.io.sockets.emit('users.count', this.io.engine.clientsCount);
+
         socket.on('getMessages', () => this.getMessages());
         socket.on('message', (value) => this.handleMessage(value));
         socket.on('update', (message) => this.editMessage(message));
@@ -36,10 +38,6 @@ class Connection {
             receiverId: data.receiver.id,
         });
 
-        console.log('🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩');
-        console.log(message);
-        console.log(this.user);
-        console.log('🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦');
         if (this.user) {
             this.io.sockets.to([data.receiver.id, data.sender.id]).emit('message', message);
         }
@@ -101,6 +99,7 @@ class Connection {
     disconnect() {
         this.socket.leave(this.user);
         this.user = null;
+        this.io.sockets.emit('users.count', this.io.engine.clientsCount);
         this.socket.disconnect();
     }
 }
