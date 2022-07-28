@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "jsxFactory": "React.createElement",
+  },
+  "exclude": [
+    "node_modules",
+    "**/node_modules/*"
+  ]
+}

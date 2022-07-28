@@ -1,4 +1,4 @@
-import { Model, DataTypes } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import { connection } from '../../core/db/postgres/db.postgres';
 
 class Message extends Model {}

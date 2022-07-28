@@ -15,7 +15,6 @@ export default function Chat() {
 
     useEffect(() => {
         const loadFriendChat = async () => {
-            if (friend.id === params.friendId) return;
 
             await friendService.getFriendChat(params.friendId).then(res => {
                 setMessages(res.messages);
